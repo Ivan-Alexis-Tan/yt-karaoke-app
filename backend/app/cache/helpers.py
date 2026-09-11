@@ -187,7 +187,22 @@ async def async_cache_yt_search(
                 duration_sec = video["duration_sec"]
             ))
 
+        db.add_all(new_video_rows)
+
+    # Create SearchCacheVideo table row if it does not exists
+    in_search_cache_video = db.query(models.SearchCacheVideo).filter(models.SearchCacheVideo.search_id == query_cache.id).first()
+
+    if not in_search_cache_video:
+        new_search_cache_videos = []
+        for cache in to_search_cache_videos:
+            new_search_cache_videos.append(models.SearchCacheVideo(
+                search_id = cache["search_id"],
+                video_id = cache["video_id"],
+                position = cache["position"],
+            ))
+
         db.add_all(new_search_cache_videos)
+        print(">>> async_cache_yt_search(): `new_search_cache_videos` saved to DB")
 
     db.commit()
 
