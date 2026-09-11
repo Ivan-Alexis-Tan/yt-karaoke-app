@@ -55,11 +55,12 @@ def parse_yt_search(data: dict):
     parsed = []
     items: list = data["items"]
 
-    for item in items:
+    for idx, item in enumerate(items, start=1):
         snippet = item["snippet"]
         thumbnail = snippet["thumbnails"]["medium"]
 
         data: dict = {
+            "position": idx,
             "video_id": item["id"]["videoId"],
             "title": snippet["title"],
             "channel_id": snippet["channelId"],
