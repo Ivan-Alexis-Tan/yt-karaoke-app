@@ -16,6 +16,9 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --red-clr: hsl(9, 100%, 62%);
+    --gray-clr: hsl(0, 0%, 35%);
+    --light-gray-clr: hsl(0, 0%, 25%);
   }
 }
 
