@@ -114,10 +114,13 @@ async def async_cache_yt_search(
 ):
     now = datetime.utcnow()
     query_exists = db.query(models.SearchCache).filter(models.SearchCache.query == query_key).first()
+    query_cache = None
 
     # Updating/Creating search key to SearchCache table
     if query_exists:
         query_exists.expires_at = now + timedelta(minutes=ttl_min)
+        db.flush()
+        query_cache = query_exists
     else:
         new_search_cache = models.SearchCache(
             query=query_key,
@@ -127,21 +130,21 @@ async def async_cache_yt_search(
         )
 
         db.add(new_search_cache)
-
-    db.flush()
+        db.flush()
+        query_cache = new_search_cache
 
     # Mapping videos and channels return from API response
     to_search_cache_videos = [
         {
-            "search_id": new_search_cache.id,
+            "search_id": query_cache.id,
             "video_id": video["video_id"],
             "channel_id": video["channel_id"],
             "channel_title": video["channel_title"],
-            "position": idx,
+            "position": video["position"],
             "in_videos_tbl": bool(db.query(models.Video).filter(models.Video.video_id == video["video_id"]).first()),
             "channel_exists": bool(db.query(models.Channel).filter(models.Channel.channel_id == video["channel_id"]).first()),
         }
-        for idx, video in enumerate(parsed_yt_search_data, start=1)
+        for video in parsed_yt_search_data
     ]
 
     # Mapping Non-existing data for videos and channels
@@ -172,9 +175,9 @@ async def async_cache_yt_search(
         yt_video_list = await yt_fetchers.req_yt_video(not_in_video_tbl)
         parsed_video_list = parse_yt_video_list(yt_video_list["items"])
 
-        new_search_cache_videos = []
+        new_video_rows = []
         for video in parsed_video_list:
-            new_search_cache_videos.append(models.Video(
+            new_video_rows.append(models.Video(
                 video_id = video["video_id"],
                 title = video["title"],
                 channel_id = video["channel_id"],
