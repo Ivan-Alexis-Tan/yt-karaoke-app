@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 # Routers
-from app.routes import yt_api
+from app.routes import yt_api, videos
 
 from app.db import SessionLocal
 from app.cache.cache import cache
@@ -34,6 +34,7 @@ def check_cache():
 
 app.include_router(router)
 app.include_router(yt_api.yt_router)
+app.include_router(videos.videos_router)
 
 origins = [
     "http://localhost:3000",
