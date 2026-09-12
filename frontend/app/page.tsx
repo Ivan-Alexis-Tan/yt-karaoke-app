@@ -1,27 +1,11 @@
-import Image from "next/image";
-
-type dataShape = {
-  id: number
-  name: string
-}[]
-
-type VidId = {
-
-}
+import KaraokeVideoCard from "@/src/components/KaraokeVideoCard"
 
 export default async function Home() {
   const baseUrl = "http://localhost:8000/api"
 
-  const apiTest = await fetch(`${baseUrl}/test/users`)
-  const jsonData = await apiTest.json()
-  const data: dataShape  = jsonData.data
-
   const query = encodeURIComponent("spongecola")
   const ytSearch = await fetch(`${baseUrl}/youtube/search?query=${query}`)
-  const ytSearchResults = await ytSearch.json()
-  const refineYTSearchResult = ytSearchResults?.data?.items ?? []
-  const searchedVideoIds = refineYTSearchResult.map(vid => vid.id.videoId)
-  const searchVideoInfos = refineYTSearchResult.map(vid => ({ id: vid.id, ...vid.snippet }))
+  const ytSearchResults: VideoListResponse = await ytSearch.json()
 
   const ytVideo = await fetch(`${baseUrl}/youtube/video/EGo3a0Lbsx4`)
   const videoJson = await ytVideo.json()
@@ -29,11 +13,7 @@ export default async function Home() {
   const caches = await fetch("http://localhost:8000/api/test/cache")
   const cacheJson = await caches.json()
 
-  console.log(jsonData)
-  console.log("=================")
-  console.log(`refineYTSearchResult =`, refineYTSearchResult)
-  console.log(`searchVideoInfos =`, searchVideoInfos)
-  console.log(`searchedVideoIds =`, searchedVideoIds)
+  console.log(`ytSearchResults =`, ytSearchResults)
   console.log("=================")
   console.log(`videoJson =`, videoJson)
   console.log("=================")
