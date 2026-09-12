@@ -1,4 +1,4 @@
-type SearchResultAPIResponse = {
+type VideoListResponse = {
     position: number
     video_id: string
     video_title: string
