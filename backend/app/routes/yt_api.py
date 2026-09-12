@@ -12,7 +12,7 @@ from app.schema import responses as response_schema
 
 yt_router = APIRouter(prefix="/api/youtube", tags=["youtube"])
 
-@yt_router.get("/search", response_model=List[response_schema.SearchResultResponse])
+@yt_router.get("/search", response_model=List[response_schema.VideoListResponse])
 async def yt_search(query: str, db: db_dependency, bg_task: BackgroundTasks):
     lowered_query: str = query.lower()
     now = datetime.utcnow()
@@ -28,7 +28,7 @@ async def yt_search(query: str, db: db_dependency, bg_task: BackgroundTasks):
         ).filter(models.SearchCacheVideo.search_id == exists.id).all()
 
         return [
-            response_schema.SearchResultResponse(
+            response_schema.VideoListResponse(
                 position=cache.position,
                 video_id=cache.video_id,
                 video_title=cache.video.title,
@@ -77,7 +77,7 @@ async def yt_search(query: str, db: db_dependency, bg_task: BackgroundTasks):
     )
 
     return [
-        response_schema.SearchResultResponse(
+        response_schema.VideoListResponse(
             position=video["position"],
             video_id=video["video_id"],
             video_title=video["title"],

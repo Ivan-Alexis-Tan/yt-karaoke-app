@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
-class SearchResultResponse(BaseModel):
-    position: int
+class VideoListResponse(BaseModel):
+    position: int | None = None
     video_id: str
     video_title: str
     channel_id: str
@@ -9,4 +9,4 @@ class SearchResultResponse(BaseModel):
     thumbnail_url: str
     thumbnail_width: int
     thumbnail_height: int
-    duration_sec: int | None
+    duration_sec: int | None = None
