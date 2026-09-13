@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, BackgroundTasks
+from fastapi import APIRouter, Depends, BackgroundTasks, HTTPException
+from starlette import status
 from sqlalchemy import func, select
 from sqlalchemy.orm import contains_eager, selectinload, joinedload
 import math
@@ -50,6 +51,91 @@ async def get_random_videos(db: db_dependency, payload: request_schema.GetRandVi
         start = end
 
     return result
+
+
+@videos_router.get("/fix")
+async def edit_thumbnails_data(query: str, db: db_dependency):
+    cache = db.query(models.SearchCache).options(
+        selectinload(models.SearchCache.search_cache_videos).selectinload(models.SearchCacheVideo.video)
+    ).filter(models.SearchCache.query == query).all()
+
+    # videos = cache[0].search_cache_videos
+
+    # videos_before = [
+    #     {
+    #         "video_id": video.video_id,
+    #         "thumbnail_width": video.video.thumbnail_width,
+    #         "thumbnail_height": video.video.thumbnail_height,
+    #     } 
+    #     for video in videos
+    # ]
+
+    # video_ids = [video["video_id"] for video in videos_before]
+    # print(f"{video_ids = }")
+
+    # # fetched = await yt_fetchers.req_yt_video(video_ids)
+    # fetched = cache_data.spongecola_videos
+    # parsed = parse_yt_video_list(fetched)
+
+    # for video in videos:
+    #     video.video.thumbnail_width = 640
+    #     video.video.thumbnail_height = 480
+
+    # urls = [
+    #     {
+    #         "video_id": video.video_id,
+    #         "url": video.video.thumbnail_url,
+    #     }
+    #     for video in videos
+    # ]
+
+    # for i in urls:
+    #     url_splitted = i["url"].split("/")
+    #     corrected = url_splitted[0:5]
+    #     corrected.append("sddefault.jpg")
+    #     joined = "/".join(corrected) 
+
+    #     print(f"{url_splitted = }")
+    #     print(f"{corrected = }")
+    #     print(f"{joined = }")
+    #     print("==============")
+
+    #     video_db = db.query(models.Video).filter(models.Video.video_id == i["video_id"]).first()
+    #     video_db.thumbnail_url = joined
+    #     video_db.thumbnail_width = 640
+    #     video_db.thumbnail_height = 480
+
+    #     db.commit()
+        
+    return cache
+
+
+@videos_router.get("/fix")
+async def fix_video(video_id: str, fix: str, db: db_dependency):
+    fix_methods = ("thumbnail_url")
+
+    if fix not in fix_methods:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid request"
+        )
+
+    video = db.query(models.Video).filter(models.Video.video_id == video_id).first()
+
+    match fix:
+        case "thumbnail_url":
+            url = (video.thumbnail_url).split("/")
+            corrected = url[0:5]
+            corrected.append("sddefault.jpg")
+            joined = "/".join(corrected) 
+
+            video.thumbnail_url = joined
+            video.thumbnail_width = 640
+            video.thumbnail_height = 480
+
+            db.commit()
+
+            return video
 
 
 @videos_router.get("/{id}")
