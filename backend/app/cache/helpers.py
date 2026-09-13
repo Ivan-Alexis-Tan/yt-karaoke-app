@@ -157,6 +157,8 @@ async def async_cache_yt_search(
 
         new_video_rows = []
         for video in parsed_video_list:
+            statistics_data = video["statistics"]
+            
             new_video_rows.append(models.Video(
                 video_id = video["video_id"],
                 title = video["title"],
@@ -164,7 +166,12 @@ async def async_cache_yt_search(
                 thumbnail_url = video["thumbnail_url"],
                 thumbnail_width = video["thumbnail_width"],
                 thumbnail_height = video["thumbnail_height"],
-                duration_sec = video["duration_sec"]
+                duration_sec = video["duration_sec"],
+                statistics = models.Statistics(
+                    view_count = statistics_data["view_count"],
+                    like_count = statistics_data["like_count"],
+                    comment_count = statistics_data["comment_count"]
+                )
             ))
 
         db.add_all(new_video_rows)
