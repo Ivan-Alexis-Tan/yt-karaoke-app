@@ -3,7 +3,8 @@ from starlette import status
 from sqlalchemy import func, select
 from sqlalchemy.orm import contains_eager, selectinload, joinedload
 import math
-from typing import List 
+from datetime import datetime, timedelta
+from typing import List
 
 from app.models import models
 from app.db import db_dependency
@@ -75,3 +76,21 @@ async def get_video(id: str, db: db_dependency, bg_task: BackgroundTasks):
     )
 
     return parsed
+
+
+@videos_router.post("/{video_id}/history", status_code=status.HTTP_204_NO_CONTENT)
+async def cache_to_history(video_id: str, db: db_dependency):
+    now = datetime.utcnow()
+
+    exists = db.query(models.History).filter(
+        models.History.video_id == video_id,
+        models.History.user_id == None,
+    ).order_by(models.History.played_at.desc()).first()
+
+    if exists and (exists.played_at + timedelta(minutes=5)) > now:
+        raise HTTPException(
+            status_code=status.HTTP_304_NOT_MODIFIED,
+            detail="Wait for 5 minutes to count in history"
+        )
+
+    await cache.cache_history(video_id=video_id, db=db)
