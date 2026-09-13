@@ -59,11 +59,6 @@ async def get_video(id: str, db: db_dependency, bg_task: BackgroundTasks):
     in_db = db.query(models.Video).filter(models.Video.video_id == id).first()
 
     if in_db:
-        bg_task.add_task(
-            cache.cache_history, 
-            video_id=in_db.video_id,
-            db=db
-        )
         return in_db
 
     fetched = await yt_fetchers.req_yt_video(id)

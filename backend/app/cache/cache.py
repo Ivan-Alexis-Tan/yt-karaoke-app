@@ -46,18 +46,6 @@ async def async_cache_videos(parsed_video_list: dict, db: db_dependency) -> None
     ]
 
     db.add_all(new_videos)
-    db.flush()
-
-    new_history = [
-        models.History(
-            user_id=None,
-            video_id=video['video_id'],
-            played_at=now,
-        )
-        for video in parsed_video_list
-    ]
-
-    db.add_all(new_history)
     db.commit()
 
 
