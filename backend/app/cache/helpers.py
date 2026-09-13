@@ -28,29 +28,6 @@ def duration_to_seconds(duration: str):
     return sum(time.values())
 
 
-async def _async_cache_yt_video(id: str, db):
-    """- Checks data in Videos table from DB
-    - If exists: ignore
-    - If does not exists: add data to Videos table
-    """
-    print(f"video_id = {id}")
-    exists = db.query(models.Video).filter_by(id=id).first()
-
-    db.close()
-
-    if exists:
-        return f"Exists: {id}"
-
-
-    return f"Does not exists: {id}"
-
-
-async def save_to_db(parsed: list):
-    for video in parsed:            
-        saved = await _async_cache_yt_video(video['video_id'], SessionLocal())
-        print(saved)
-
-
 def parse_yt_search(data: dict):
     parsed = []
     items: list = data["items"]
