@@ -19,9 +19,10 @@
     --lucent-blk-clr: hsla(0, 0%, 0%, 0.6);
     --lucent-blk-clr-75: hsla(0, 0%, 0%, 0.75);
     --red-clr: hsl(9, 100%, 62%);
+    --gry-700: hsl(217, 21%, 27%);
     --gray-clr: hsl(0, 0%, 35%);
     --light-gray-clr: hsl(0, 0%, 25%);
-
+    
     --z-base: 0;
     --z-navbar: 300;
   }
