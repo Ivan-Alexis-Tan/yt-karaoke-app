@@ -36,6 +36,7 @@ class Video(BaseModel):
 
     history: Mapped[list["History"]] = relationship(back_populates="video")
     channel: Mapped["Channel"] = relationship(back_populates="videos")
+    statistics: Mapped["Statistics"] = relationship(back_populates="video")
 
 
 class Channel(BaseModel):
@@ -80,3 +81,14 @@ class SearchCacheVideo(BaseModel):
 
     search: Mapped["SearchCache"] = relationship(back_populates="search_cache_videos")
     video: Mapped["Video"] = relationship()
+
+
+class Statistics(BaseModel):
+    __tablename__ = "statistics"
+
+    video_id: Mapped[str] = mapped_column(ForeignKey("videos.video_id"), unique=True, nullable=True)
+    view_count: Mapped[int] = mapped_column(nullable=True)
+    like_count: Mapped[int] = mapped_column(nullable=True)
+    comment_count: Mapped[int] = mapped_column(nullable=True)
+
+    video: Mapped[Optional["Video"]] = relationship(back_populates="statistics")
