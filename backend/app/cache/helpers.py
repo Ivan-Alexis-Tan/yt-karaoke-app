@@ -85,12 +85,6 @@ def parse_yt_video_list(video_list: dict):
     return parsed_list
 
 
-async def req_yt_api_search(api_fn):
-    data = await api_fn()
-
-    return parse_yt_search(data)
-
-
 async def async_cache_yt_search(
     query_key: str, 
     etag: str, 
