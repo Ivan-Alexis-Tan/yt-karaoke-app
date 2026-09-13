@@ -182,30 +182,3 @@ async def async_cache_yt_search(
         print(">>> async_cache_yt_search(): `new_search_cache_videos` saved to DB")
 
     db.commit()
-
-
-async def async_cache_videos(vid_id: str, api_fn, ttl_min: int = 60):
-    now = datetime.utcnow()
-    cached_vid = cache["videos"]
-    exists = [item for item in cached_vid if item["id"] == vid_id]
-
-    if len(exists) >= 1 and exists[0]["expires"] > now:
-        return exists[0]
-
-    # data = await api_fn()
-    data: dict = ytVideo
-    parsed = parse_yt_video_list(ytVideo["items"])
-    print(f"{parsed = }")
-
-    new_cache = {
-        "id": vid_id,
-        "data": data,
-        "expires": now + timedelta(minutes=ttl_min),
-    }
-
-    cache["videos"] = [
-        *cache["videos"],
-        new_cache
-    ]
-
-    return data
