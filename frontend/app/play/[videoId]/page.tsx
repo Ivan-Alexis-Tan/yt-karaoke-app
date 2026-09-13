@@ -1,5 +1,6 @@
 import { BASE_URL } from "@/src/utils/helpers";
 import KaraokePlayer from "./KaraokePlayer"
+import { cacheToHistory, getVideo } from "@/src/api/videosApi";
 
 type PlayerPageProps = {
     params: Promise<{videoId: string}>
@@ -7,7 +8,8 @@ type PlayerPageProps = {
 
 export default async function PlayerPage({ params }: PlayerPageProps) {
     const videoId = (await params).videoId;
-    const videoDetails = await (await fetch(`${BASE_URL}/videos/${videoId}`)).json()
+    const videoDetails = await (await getVideo(videoId)).json()
+    await cacheToHistory(videoId)
 
     console.log(`videoDetails =`, videoDetails)
     return (
