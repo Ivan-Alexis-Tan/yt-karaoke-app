@@ -52,13 +52,17 @@ def parse_yt_search(data: dict):
     return parsed
 
 
-def parse_yt_video_list(video_items: list):
+def parse_yt_video_list(video_list: dict):
     parsed_list = []
 
-    for video in video_items:
+    for video in video_list["items"]:
         snippet = video["snippet"]
-        thumbnail = snippet["thumbnails"]["medium"]
+        thumbnail = snippet["thumbnails"]["standard"]
         duration = video["contentDetails"]["duration"]
+        statistics = video["statistics"]
+        
+        snippet_keys = snippet.keys()
+        statistics_keys = statistics.keys()
 
         parsed_list.append({
             "video_id": video["id"],
@@ -69,8 +73,13 @@ def parse_yt_video_list(video_items: list):
             "channel_id": snippet['channelId'],
             "channel_title": snippet["channelTitle"],
             "duration_sec": duration_to_seconds(duration),
-            "tags": snippet["tags"],
-            "category_id": snippet["categoryId"],
+            "tags": snippet["tags"] if "tags" in snippet_keys else [],
+            "category_id": snippet["categoryId"] if "categoryId" in snippet_keys else None,
+            "statistics": {
+                "view_count": statistics["viewCount"] if "viewCount" in statistics_keys else None,
+                "like_count": statistics["likeCount"] if "likeCount" in statistics_keys else None,
+                "comment_count": statistics["commentCount"] if "likeCount" in statistics_keys else None,
+            }
         })
 
     return parsed_list
