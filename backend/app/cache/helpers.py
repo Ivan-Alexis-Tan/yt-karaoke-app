@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from app.cache.cache import cache, ytSearchResult, ytVideo
+from app.cache.cache_data import cache, ytSearchResult, ytVideo
 from app.db import SessionLocal, db_dependency
 from app.models import models
 from app.utils import yt_fetchers
@@ -153,7 +153,7 @@ async def async_cache_yt_search(
     # Create row of videos if it does not exists in DB 
     if len(not_in_video_tbl) >= 1:
         yt_video_list = await yt_fetchers.req_yt_video(not_in_video_tbl)
-        parsed_video_list = parse_yt_video_list(yt_video_list["items"])
+        parsed_video_list = parse_yt_video_list(yt_video_list)
 
         new_video_rows = []
         for video in parsed_video_list:
