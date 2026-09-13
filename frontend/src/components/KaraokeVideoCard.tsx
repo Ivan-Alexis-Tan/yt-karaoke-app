@@ -1,4 +1,6 @@
+import Link from "next/link"
 import { formatMinutesSeconds } from "../utils/helpers"
+import Image from "next/image"
 
 export type KaraokeVideoCardType = {
     video_id: string
@@ -24,9 +26,11 @@ export default function KaraokeVideoCard({
     const durationInMinutes = formatMinutesSeconds(duration_sec)
 
     return (
-        <div className="p-1 max-w-130 flex flex-col gap-3 mb-5 rounded-2xl hover:bg-gray-700 transition-all">
+        <Link className="p-1 max-w-130 flex flex-col gap-3 mb-5 rounded-2xl hover:bg-(--gry-700) transition-all"
+            href={`play/${video_id}`}
+        >
             <div className="relative">
-                <img className="w-full rounded-2xl" 
+                <Image className="w-full rounded-2xl" 
                     src={thumbnail_url} alt="video thumbnail" 
                     width={thumbnail_width} height={thumbnail_height} 
                 />
@@ -40,6 +44,6 @@ export default function KaraokeVideoCard({
                 <h3 className="text-xl font-bold">{video_title}</h3>
                 <p>{channel_title}</p>
             </div>
-        </div>
+        </Link>
     )
 }
