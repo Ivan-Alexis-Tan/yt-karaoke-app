@@ -92,3 +92,21 @@ class Statistics(BaseModel):
     comment_count: Mapped[int] = mapped_column(nullable=True)
 
     video: Mapped[Optional["Video"]] = relationship(back_populates="statistics")
+
+
+class NextVideo(BaseModel):
+    __tablename__ = "next_videos"
+
+    init_video_id: Mapped[str] = mapped_column(ForeignKey("videos.video_id"))
+    next_video_id: Mapped[str] = mapped_column(ForeignKey("videos.video_id"))
+    count: Mapped[int]
+
+    next_video: Mapped["Video"] = relationship(foreign_keys=[next_video_id])
+
+    __table_args__ = (
+        UniqueConstraint(
+            "init_video_id",
+            "next_video_id",
+            name="unq_next_video_pair"
+        ),
+    )
