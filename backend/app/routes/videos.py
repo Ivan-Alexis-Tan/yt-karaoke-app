@@ -54,14 +54,14 @@ async def get_random_videos(db: db_dependency, payload: request_schema.GetRandVi
     return result
 
 
-@videos_router.get("/{id}")
-async def get_video(id: str, db: db_dependency, bg_task: BackgroundTasks):
-    in_db = db.query(models.Video).filter(models.Video.video_id == id).first()
+@videos_router.get("/{video_id}")
+async def get_video(video_id: str, db: db_dependency, bg_task: BackgroundTasks):
+    in_db = db.query(models.Video).filter(models.Video.video_id == video_id).first()
 
     if in_db:
         return in_db
 
-    fetched = await yt_fetchers.req_yt_video(id)
+    fetched = await yt_fetchers.req_yt_video(video_id)
     parsed = parse_yt_video_list(fetched)
 
     bg_task.add_task(
