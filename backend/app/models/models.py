@@ -1,4 +1,4 @@
-from sqlalchemy import String, Text, ForeignKey
+from sqlalchemy import String, Text, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 import uuid
 from datetime import datetime
@@ -27,7 +27,7 @@ class Video(BaseModel):
     __tablename__ = "videos"
 
     video_id: Mapped[str] = mapped_column(String(50), unique=True)
-    title: Mapped[str] = mapped_column(String(99))
+    title: Mapped[str] = mapped_column(Text)
     channel_id: Mapped[str] = mapped_column(ForeignKey("channels.channel_id"))
     thumbnail_url: Mapped[str] = mapped_column(Text)
     thumbnail_width: Mapped[int]
