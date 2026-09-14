@@ -1,4 +1,5 @@
 export const bannedChannels = [
     "Sing King",
-    "KaraFun Karaoke"
+    "KaraFun Karaoke",
+    "Inside Lyric",
 ]
