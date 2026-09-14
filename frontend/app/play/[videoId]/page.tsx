@@ -1,6 +1,7 @@
-import { BASE_URL } from "@/src/utils/helpers";
 import KaraokePlayer from "./KaraokePlayer"
-import { cacheToHistory, getVideo } from "@/src/api/videosApi";
+import { cacheToHistory, getRandomVideos, getVideo } from "@/src/api/videosApi";
+import ShowVideos from "@/app/ShowVideos";
+import MainPlayer from "./MainPlayer";
 
 type PlayerPageProps = {
     params: Promise<{videoId: string}>
@@ -9,13 +10,15 @@ type PlayerPageProps = {
 export default async function PlayerPage({ params }: PlayerPageProps) {
     const videoId = (await params).videoId;
     const videoDetails = await (await getVideo(videoId)).json()
-    await cacheToHistory(videoId)
+    const randomVideos = await (await getRandomVideos()).json()
+    // await cacheToHistory(videoId)
 
     console.log(`videoDetails =`, videoDetails)
     return (
         <div>
-            <KaraokePlayer className=""
+            <MainPlayer 
                 videoId={videoId}
+                videoList={randomVideos} 
             />
         </div>
     )
