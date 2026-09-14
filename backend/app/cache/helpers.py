@@ -59,7 +59,16 @@ def parse_yt_video_list(video_list: dict):
 
     for video in video_list["items"]:
         snippet = video["snippet"]
-        thumbnail = snippet["thumbnails"]["standard"]
+
+        thumbnail_keys = snippet["thumbnails"].keys()
+
+        if "standard" in thumbnail_keys:
+            thumbnail = snippet["thumbnails"]["standard"]
+        elif "high" in thumbnail_keys:
+            thumbnail = snippet["thumbnails"]["high"]
+        else:
+            thumbnail = snippet["thumbnails"]["medium"]
+
         duration = video["contentDetails"]["duration"]
         statistics = video["statistics"]
         
@@ -80,7 +89,7 @@ def parse_yt_video_list(video_list: dict):
             "statistics": {
                 "view_count": statistics["viewCount"] if "viewCount" in statistics_keys else None,
                 "like_count": statistics["likeCount"] if "likeCount" in statistics_keys else None,
-                "comment_count": statistics["commentCount"] if "likeCount" in statistics_keys else None,
+                "comment_count": statistics["commentCount"] if "commentCount" in statistics_keys else None,
             }
         })
 
