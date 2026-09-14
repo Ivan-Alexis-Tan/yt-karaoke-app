@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import List
 
 from app.core import config
-from app.cache.helpers import async_cache_yt_search, async_cache_videos, parse_yt_search, ytSearchResult
+from app.cache.helpers import async_cache_yt_search, parse_yt_search, ytSearchResult
 from app.db import db_dependency
 from app.models import models
 from app.schema import responses as response_schema
@@ -50,7 +50,7 @@ async def yt_search(query: str, db: db_dependency, bg_task: BackgroundTasks):
             "part": "snippet",
             "q": f"{lowered_query} karaoke",
             "type": "video",
-            "maxResults": 10,
+            "maxResults": 20,
             "key": config.API_KEY,
         }
 
