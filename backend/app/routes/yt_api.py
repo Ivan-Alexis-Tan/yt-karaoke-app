@@ -90,32 +90,3 @@ async def yt_search(query: str, db: db_dependency, bg_task: BackgroundTasks):
         )
         for video in parsed
     ]
-
-    # return parsed
-
-
-@yt_router.get("/video/{id}")
-async def get_video(id: str):
-    params = {
-        "id": id,
-        "part": "snippet,contentDetails",
-        "key": config.API_KEY
-    }
-
-    async def api_req():
-        async with httpx.AsyncClient() as client:
-            print(">> Called the YT API")
-            response = await client.get(
-                url=f"{config.YOUTUBE_URL}/videos",
-                params=params
-            )
-            response.raise_for_status()
-            return response.json()
-
-
-    result = await async_cache_videos(
-        vid_id=id,
-        api_fn=api_req,
-    )
-
-    return result
