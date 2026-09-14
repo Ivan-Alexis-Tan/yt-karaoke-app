@@ -73,6 +73,32 @@ async def get_video(video_id: str, db: db_dependency, bg_task: BackgroundTasks):
     return parsed
 
 
+@videos_router.post("/next_video", status_code=status.HTTP_201_CREATED)
+async def to_next_video(init_id: str, next_id: str, db: db_dependency):
+    exists = (
+        db.query(models.NextVideo)
+        .filter(
+            models.NextVideo.init_video_id == init_id,
+            models.NextVideo.next_video_id == next_id
+        ).first()
+    )
+
+    if exists:
+        exists.count =+ 1
+        raise HTTPException(
+            status_code=status.HTTP_204_NO_CONTENT,
+            detail="Count modified."
+        )
+
+    db.add(models.NextVideo(
+        init_video_id = init_id,
+        next_video_id = next_id,
+        count = 1
+    ))
+    db.commit()
+    
+
+
 @videos_router.post("/{video_id}/history", status_code=status.HTTP_204_NO_CONTENT)
 async def cache_to_history(video_id: str, db: db_dependency):
     now = datetime.utcnow()
