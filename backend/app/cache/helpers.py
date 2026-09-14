@@ -1,3 +1,5 @@
+from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 from datetime import datetime, timedelta
 
 from app.cache.cache_data import cache, ytSearchResult, ytVideo
@@ -177,11 +179,19 @@ async def async_cache_yt_search(
         db.add_all(new_video_rows)
 
     # Create SearchCacheVideo table row if it does not exists
-    in_search_cache_video = db.query(models.SearchCacheVideo).filter(models.SearchCacheVideo.search_id == query_cache.id).first()
-
-    if not in_search_cache_video:
+    q_search_cache_video = (
+        select(models.SearchCacheVideo.video_id)
+        .filter(models.SearchCacheVideo.search_id == query_cache.id)
+    )
+    in_search_cache_video = db.execute(q_search_cache_video).scalars().all()
+    not_in_search_cache_video = [
+        video
+        for video in to_search_cache_videos if video["video_id"] not in in_search_cache_video
+    ]
+    
+    if len(not_in_search_cache_video) >= 1:
         new_search_cache_videos = []
-        for cache in to_search_cache_videos:
+        for cache in not_in_search_cache_video:
             new_search_cache_videos.append(models.SearchCacheVideo(
                 search_id = cache["search_id"],
                 video_id = cache["video_id"],
@@ -190,5 +200,5 @@ async def async_cache_yt_search(
 
         db.add_all(new_search_cache_videos)
         print(">>> async_cache_yt_search(): `new_search_cache_videos` saved to DB")
-
+          
     db.commit()
