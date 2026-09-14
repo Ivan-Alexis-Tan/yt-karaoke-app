@@ -1,3 +1,4 @@
+import { bannedChannels } from "@/src/appData";
 import { BASE_URL, formatMinutesSeconds } from "@/src/utils/helpers";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,7 +17,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             {searchResults.map(vid => (
                 <Link key={vid.video_id}
                     href={`play/${vid.video_id}`}
-                    className="mx-auto max-h-90 max-w-300 w-full p-2 gap-3 grid grid-cols-[minmax(160px,0.7fr)_minmax(100,1.3fr)] items-center rounded-2xl hover:bg-(--gry-700)"
+                    className={`${bannedChannels.includes(vid.channel_title) && "hidden"} mx-auto max-h-90 max-w-300 w-full p-2 gap-3 grid grid-cols-[minmax(160px,0.7fr)_minmax(100,1.3fr)] items-center rounded-2xl hover:bg-(--gry-700)`}
                 >
                     <div className="relative">
                         <Image className="max-h-fit h-full rounded-2xl" 
