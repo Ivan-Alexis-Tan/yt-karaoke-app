@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { formatMinutesSeconds } from "../utils/helpers"
 import Image from "next/image"
+import { bannedChannels } from "../appData"
 
 export type KaraokeVideoCardType = {
     video_id: string
@@ -11,6 +12,7 @@ export type KaraokeVideoCardType = {
     thumbnail_width: number
     thumbnail_height: number
     duration_sec: number
+    arrange?: "row" | "col"
 }
 
 export default function KaraokeVideoCard({
@@ -22,12 +24,16 @@ export default function KaraokeVideoCard({
     thumbnail_height,
     thumbnail_width,
     duration_sec,
+    arrange = "row"
 }: KaraokeVideoCardType) {
     const durationInMinutes = formatMinutesSeconds(duration_sec)
 
     return (
-        <Link className="p-1 max-w-130 flex flex-col gap-3 mb-5 rounded-2xl hover:bg-(--gry-700) transition-all"
-            href={`play/${video_id}`}
+        <Link className={`
+            ${bannedChannels.includes(channel_title) && "hidden"} 
+            ${arrange === "row" ? "" : "flex-col"}
+            p-1 max-w-130 flex gap-3 mb-5 rounded-2xl hover:bg-(--gry-700) transition-all`}
+            href={`/play/${video_id}`}
         >
             <div className="relative">
                 <Image className="w-full rounded-2xl" 
