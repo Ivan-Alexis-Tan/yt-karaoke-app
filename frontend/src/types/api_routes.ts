@@ -9,3 +9,5 @@ type VideoListResponse = {
     thumbnail_height: number
     duration_sec?: number
 }[]
+
+type SearchMode = "local" | "online"
