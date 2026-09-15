@@ -4,24 +4,31 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import SearchIcon from "@/src/svgs/SearchIcon";
 import { capsWord } from "@/src/utils/helpers";
+
+import SearchIcon from "@/src/svgs/SearchIcon";
 import YoutubeIcon from "@/src/svgs/YoutubeIcon";
 import KaraokeMicIcon from "@/src/svgs/KaraokeMicIcon";
-import MenuIcon from "@/src/svgs/MenuIcon";
+import QueueIcon from "@/src/svgs/QueueIcon";
+import SongQueue from "@/src/components/SongQueue";
 
 export default function Navbar({ className }: { className?: string }) {
     const [search, setSearch] = useState("")
     const [searchMode, setSearchMode] = useState<SearchMode>("local")
+    const [showQueue, setShowQueue] = useState<boolean>(false)
 
     const router = useRouter()
     const path = usePathname()
 
-    useEffect(() => setSearchMode("local"), [path])
+    useEffect(() => {
+        setSearchMode("local")
+        setShowQueue(false)
+    }, [path])
 
     return (
         <nav className={`${className ?? ""}`}>
             <div className="gap-3 sm:gap-6 flex justify-between items-center">
+                {/* Brand Name and Home Link */}
                 <Link href={"/"}
                     className="text-(--red-clr) min-w-11 min-h-11 hover:text-foreground"
                     title="Youtube Karaoke App"
@@ -35,6 +42,7 @@ export default function Navbar({ className }: { className?: string }) {
                     </h2>
                 </Link>
 
+                {/* Search Bar in Navbar */}
                 <div className="min-w-10 max-w-80 sm:max-w-130 flex-1 max gap-1 sm:gap-3 flex border rounded-2xl">
                     <input type="text" 
                         title="Search a song"
@@ -45,7 +53,7 @@ export default function Navbar({ className }: { className?: string }) {
                         className="pl-5 min-w-5 flex-1 rounded-l-2xl"
                     />
 
-                    <button className="my-2 px-1 bg-foreground text-background hover:bg-(--red-clr) hover:text-white"
+                    <button className="my-2 px-1 bg-foreground text-background hover:bg-(--red-clr) hover:text-white transition-colors"
                         onClick={_ => setSearchMode(p => p === "local" ? "online" : "local")}
                         title={`Is set to ${searchMode} search`}
                     >
@@ -59,10 +67,25 @@ export default function Navbar({ className }: { className?: string }) {
                     </Link>
                 </div>
 
+                {/* User Tools */}
                 <div>
-                    <MenuIcon className="w-10 h-10 sm:hidden" />
-                    <p className="hidden sm:block">Something here</p>
+                    {/* <MenuIcon className="w-10 h-10 sm:hidden" /> */}
+                    <button onClick={_ => setShowQueue(p => !p)}
+                        title={`${showQueue ? "Close" : "Open"} song queue`}
+                        className={`${showQueue && "bg-(--red-clr) border-(--red-clr)"} px-1 border rounded-xl`}
+                    >
+                        <QueueIcon className="w-10 h-10" />
+                    </button>
                 </div>
+
+                {showQueue 
+                    && <>
+                        <div className="w-full h-full fixed top-18 left-0"
+                            onClick={_ => setShowQueue(false)}
+                        />
+                        <SongQueue closeFn={setShowQueue} />
+                    </>
+                }
             </div>
         </nav>
     )
