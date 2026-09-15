@@ -54,6 +54,28 @@ async def get_random_videos(db: db_dependency, payload: request_schema.GetRandVi
     return result
 
 
+@videos_router.get("/local", response_model=List[response_schema.VideoListResponse])
+async def search_local(query: str, db: db_dependency):
+    query = db.execute(
+        select(models.Video)
+        .where(models.Video.title.ilike(f"%{query}%"))
+    ).scalars().all()
+
+    return [
+        response_schema.VideoListResponse(
+            video_id=video.video_id,
+            video_title=video.title,
+            channel_id=video.channel_id,
+            channel_title=video.channel.name,
+            thumbnail_url=video.thumbnail_url,
+            thumbnail_width=video.thumbnail_width,
+            thumbnail_height=video.thumbnail_height,
+            duration_sec=video.duration_sec,
+        )
+        for video in query
+    ]
+
+
 @videos_router.get("/{video_id}")
 async def get_video(video_id: str, db: db_dependency, bg_task: BackgroundTasks):
     in_db = db.query(models.Video).filter(models.Video.video_id == video_id).first()
