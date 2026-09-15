@@ -24,6 +24,7 @@
     --light-gray-clr: hsl(0, 0%, 25%);
     
     --z-base: 0;
+    --z-options: 100;
     --z-navbar: 300;
   }
 }
