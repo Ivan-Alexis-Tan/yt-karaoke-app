@@ -1,22 +1,32 @@
+import { searchVideosLocal, searchVideosOnline } from "@/src/api/videosApi";
 import { bannedChannels } from "@/src/appData";
-import { BASE_URL, formatMinutesSeconds } from "@/src/utils/helpers";
+import { capsWord, formatMinutesSeconds } from "@/src/utils/helpers";
 import Image from "next/image";
 import Link from "next/link";
 
 type SearchPageProps = {
     searchParams: Promise<{query: string}>
+    params: Promise<{searchMode: SearchMode}>
 }
 
-export default async function SearchPage({ searchParams }: SearchPageProps) {
-    const params = await searchParams;
-    const urlParams = new URLSearchParams(params)
-    const searchResults: VideoListResponse = await (await fetch(`${BASE_URL}/youtube/search?${urlParams}`)).json()
+export default async function SearchPage({ searchParams, params }: SearchPageProps) {
+    const { searchMode } = await params;
+    const { query } = await searchParams;
+
+    async function generateSearch(): Promise<VideoListResponse> {
+        if (searchMode === "local") return await (await searchVideosLocal(query)).json();
+
+        return await (await searchVideosOnline(query)).json()
+    }
+
+    const searchResults = await generateSearch()
 
     return (
         <div className="mx-5 flex flex-col justify-center">
+            <p className="my-5 text-xl">{capsWord(searchMode)} search results:</p>
             {searchResults.map(vid => (
                 <Link key={vid.video_id}
-                    href={`play/${vid.video_id}`}
+                    href={`/play/${vid.video_id}`}
                     className={`${bannedChannels.includes(vid.channel_title) && "hidden"} mx-auto max-h-90 max-w-300 w-full p-2 gap-3 grid grid-cols-[minmax(160px,0.7fr)_minmax(100,1.3fr)] items-center rounded-2xl hover:bg-(--gry-700)`}
                 >
                     <div className="relative">
