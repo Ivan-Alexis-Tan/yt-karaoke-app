@@ -22,3 +22,14 @@ export async function cacheToHistory(videoId: string) {
 export async function getVideo(videoId: string) {
     return await fetch(`${BASE_URL}/videos/${videoId}`)
 }
+
+// Search Video Fetchers
+export async function searchVideosLocal(query: string) {
+    const params = new URLSearchParams({ query }) 
+    return await fetch(`${BASE_URL}/videos/local?${params.toString()}`)
+}
+
+export async function searchVideosOnline(query: string) {
+    const params = new URLSearchParams({ query }) 
+    return await fetch(`${BASE_URL}/youtube/search?${params.toString()}`)
+}
