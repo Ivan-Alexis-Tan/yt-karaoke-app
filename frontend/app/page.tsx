@@ -4,8 +4,7 @@ import ShowVideos from "./ShowVideos";
 import { getRandomVideos } from "@/src/api/videosApi";
 
 export default async function Home() {
-  const fetchRandomVids = await getRandomVideos(15, 60)
-  const randomVideos: VideoListResponse[] = await fetchRandomVids.json()
+  const randomVideos = await getRandomVideos(15, 60)
 
   return (
     <div className="pb-5 bg-zinc-50 font-sans dark:bg-black">

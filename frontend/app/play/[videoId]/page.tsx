@@ -9,16 +9,17 @@ type PlayerPageProps = {
 
 export default async function PlayerPage({ params }: PlayerPageProps) {
     const videoId = (await params).videoId;
-    const videoDetails = await (await getVideo(videoId)).json()
-    const randomVideos = await (await getRandomVideos()).json()
+    const videoDetails = await getVideo(videoId)
+    const randomVideos = await getRandomVideos()
     // await cacheToHistory(videoId)
 
     console.log(`videoDetails =`, videoDetails)
     return (
-        <div>
+        <div className="lg:h-[calc(100vh-80px)]">
             <MainPlayer 
                 videoId={videoId}
-                videoList={randomVideos} 
+                videoList={randomVideos}
+                className="h-full"
             />
         </div>
     )
