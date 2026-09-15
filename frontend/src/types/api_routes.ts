@@ -1,5 +1,5 @@
 type VideoListResponse = {
-    position: number
+    position?: number
     video_id: string
     video_title: string
     channel_id: string
