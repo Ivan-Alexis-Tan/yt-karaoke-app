@@ -5,8 +5,8 @@ import Image from "next/image"
 import { useState } from "react";
 
 import { formatMinutesSeconds } from "../utils/helpers"
-import { addSongQueue } from "../utils/queueFn";
 import { bannedChannels } from "../appData"
+import useSongQueue, { addSongQueueSelector } from "../utils/useSongQueue";
 
 import AddToListIcon from "../svgs/AddToListIcon";
 import SongAddedIcon from "../svgs/SongAddedIcon";
@@ -39,6 +39,7 @@ export default function KaraokeVideoCard({
     className,
 }: KaraokeVideoCardType) {
     const [songAdded, setSongAdded] = useState(false)
+    const addSongQueue = useSongQueue(addSongQueueSelector)
 
     function addToQueue() {
         addSongQueue({

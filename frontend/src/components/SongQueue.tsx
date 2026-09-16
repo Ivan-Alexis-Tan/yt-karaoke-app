@@ -2,26 +2,31 @@
 
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
-import { deleteSongQueue, emptySongQueue, getSongQueue } from "../utils/queueFn";
-
 import KaraokeVideoCard from "./KaraokeVideoCard";
 import CloseIcon from "../svgs/CloseIcon";
 import EmptyQueueIcon from "../svgs/EmptyQueueIcon";
 import DeleteIcon from "../svgs/DeleteIcon";
+import useSongQueue, { 
+    songQueueSelector, 
+    deleteSongQueueSelector, 
+    emptySongQueueSelector 
+} from "../utils/useSongQueue";
+import NoSongOnQueueIcon from "../svgs/NoSongOnQueueIcon";
 
 type SongQueueParams = { 
     closeFn: Dispatch<SetStateAction<boolean>>
     className?: string 
 }
 export default function SongQueue({ closeFn, className }: SongQueueParams) {
-    const [queue, setQueue] = useState<VideoListResponse>(getSongQueue())
     const [popupWindow, setPopupWindow] = useState(false)
-
-    useEffect(() => console.log(`queue =`, queue), [queue])
+    
+    const songQueue = useSongQueue(songQueueSelector)
+    const deleteSongQueue = useSongQueue(deleteSongQueueSelector)
+    const emptySongQueue = useSongQueue(emptySongQueueSelector)
 
     return (
-        <div className="max-w-150 w-[60%] h-[calc(100vh-4.5rem)] fixed right-0 top-18 rounded-l-xl bg-(--gray-clr) overflow-auto">
-            {queue.length >= 1
+        <div className={`${className ?? ""} max-w-150 w-[60%] h-[calc(100vh-4.5rem)] fixed right-0 top-18 rounded-l-xl bg-(--gray-clr) overflow-auto`}>
+            {songQueue.length >= 1
                 ? <div className="relative">
                     <div className="gap-3 sticky top-0 right-0 z-(--z-navbar) bg-(--gray-clr) flex justify-end">
                         <button onClick={_ => setPopupWindow(true)} className="hover:text-(--red-clr)">
@@ -34,13 +39,11 @@ export default function SongQueue({ closeFn, className }: SongQueueParams) {
                         </button>
                     </div>
 
-                    {queue.map(vid => (
+                    {songQueue.map(vid => (
                         <div key={vid.video_id} 
                             className="mx-3 relative hover:bg-(--light-gray-clr) hover:[&>button]:flex rounded-2xl"
                         >
-                            <div onClick={_ => {
-                                deleteSongQueue(vid.video_id)
-                            }}>
+                            <div onClick={_ => deleteSongQueue(vid.video_id)}>
                                 <KaraokeVideoCard 
                                     video_id={vid.video_id}
                                     video_title={vid.video_title}
@@ -57,7 +60,6 @@ export default function SongQueue({ closeFn, className }: SongQueueParams) {
                             <button className="hidden w-10 h-10 absolute bottom-2 right-2 justify-center items-center hover:bg-background rounded-full"
                                 onClick={_ => {
                                     deleteSongQueue(vid.video_id)
-                                    setQueue(getSongQueue())
                                 }}
                             >
                                 <DeleteIcon className="w-7 h-7" />
@@ -71,20 +73,21 @@ export default function SongQueue({ closeFn, className }: SongQueueParams) {
                     >
                         <CloseIcon className="w-7 h-7" />
                     </button>
-                    <div className="flex justify-center items-center">
+                    <div className="flex flex-col justify-center items-center">
+                        <NoSongOnQueueIcon className="w-15 h-15" />
                         <p className="text-xl">No song currently on queue</p>
                     </div>
                 </div>
             }
 
-            {popupWindow && <ConfirmDeletePopup popupFn={setPopupWindow} setQueueFn={setQueue} />}
+            {popupWindow && <ConfirmDeletePopup popupFn={setPopupWindow} emptySongQueue={emptySongQueue} />}
         </div>
     )
 }
 
-const ConfirmDeletePopup = ({ popupFn, setQueueFn }: {
+const ConfirmDeletePopup = ({ popupFn, emptySongQueue }: {
     popupFn: Dispatch<SetStateAction<boolean>>
-    setQueueFn: Dispatch<SetStateAction<VideoListResponse>>
+    emptySongQueue: () => void
 }) => {
     return (
         <div className="w-full h-full fixed top-18 left-0 flex justify-center items-center bg-[hsla(0,100%,100%,0.2)]">
@@ -95,7 +98,6 @@ const ConfirmDeletePopup = ({ popupFn, setQueueFn }: {
                     <button className="hover:bg-(--red-clr) hover:border-(--red-clr)"
                         onClick={_ => {
                             emptySongQueue()
-                            setQueueFn(getSongQueue())
                             popupFn(false)
                         }}
                     >
