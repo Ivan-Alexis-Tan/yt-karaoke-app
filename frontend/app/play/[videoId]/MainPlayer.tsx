@@ -1,14 +1,15 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { getSongQueue } from "@/src/utils/queueFn";
+import useSongQueue, { songQueueSelector, deleteSongQueueSelector } from "@/src/utils/useSongQueue";
 
 import KaraokePlayer from "./KaraokePlayer";
 import ShowVideos from "@/app/ShowVideos";
 import SongNoteIcon from "@/src/svgs/SongNoteIcon";
 import SearchIcon from "@/src/svgs/SearchIcon";
 import HideIcon from "@/src/svgs/HideIcon";
+import NextSongControl from "./NextSongControl";
 
 type MainPlayerProps = {
     videoId: string
@@ -20,9 +21,9 @@ type PaneKeys = "none" | "songs" | "search"
 
 export default function MainPlayer({ videoId, videoList, className }: MainPlayerProps) {
     const [showPane, setShowPane] = useState<PaneKeys>("songs")
-    const [songQueue, setSongQueue] = useState(getSongQueue())
 
-    useEffect(() => console.log(`showPane =`, showPane), [showPane])
+    const songQueue = useSongQueue(songQueueSelector)
+    const deleteSongQueue = useSongQueue(deleteSongQueueSelector)
 
     const RightPaneControls = ({ className }: { className?: string }) => {
         return (
@@ -56,7 +57,15 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
             <div>
                 <KaraokePlayer videoId={videoId} />
 
-                <RightPaneControls className="mx-5 mb-5 gap-3 flex justify-end" />
+                <div className="mb-5 mx-5 gap-6 flex flex-col sm:flex-row justify-between">
+                    <NextSongControl 
+                        songQueue={songQueue}
+                        deleteSongQueue={deleteSongQueue}
+                        className="flex-1"
+                    />
+
+                    <RightPaneControls className="gap-3 flex justify-end" />
+                </div>
             </div>
 
             {showPane === "songs"
