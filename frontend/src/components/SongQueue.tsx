@@ -38,17 +38,21 @@ export default function SongQueue({ closeFn, className }: SongQueueParams) {
                         <div key={vid.video_id} 
                             className="mx-3 relative hover:bg-(--light-gray-clr) hover:[&>button]:flex rounded-2xl"
                         >
-                            <KaraokeVideoCard 
-                                video_id={vid.video_id}
-                                video_title={vid.video_title}
-                                channel_id={vid.channel_id}
-                                channel_title={vid.channel_title}
-                                thumbnail_url={vid.thumbnail_url}
-                                thumbnail_width={vid.thumbnail_width}
-                                thumbnail_height={vid.thumbnail_height}
-                                duration_sec={vid.duration_sec as number}
-                                disableQueBtn={true}
-                            />
+                            <div onClick={_ => {
+                                deleteSongQueue(vid.video_id)
+                            }}>
+                                <KaraokeVideoCard 
+                                    video_id={vid.video_id}
+                                    video_title={vid.video_title}
+                                    channel_id={vid.channel_id}
+                                    channel_title={vid.channel_title}
+                                    thumbnail_url={vid.thumbnail_url}
+                                    thumbnail_width={vid.thumbnail_width}
+                                    thumbnail_height={vid.thumbnail_height}
+                                    duration_sec={vid.duration_sec as number}
+                                    disableQueBtn={true}
+                                />
+                            </div>
                             
                             <button className="hidden w-10 h-10 absolute bottom-2 right-2 justify-center items-center hover:bg-background rounded-full"
                                 onClick={_ => {
