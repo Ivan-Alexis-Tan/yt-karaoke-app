@@ -1,27 +1,20 @@
 "use client"
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { capsWord } from "@/src/utils/helpers";
-
-import SearchIcon from "@/src/svgs/SearchIcon";
 import YoutubeIcon from "@/src/svgs/YoutubeIcon";
 import KaraokeMicIcon from "@/src/svgs/KaraokeMicIcon";
 import QueueIcon from "@/src/svgs/QueueIcon";
 import SongQueue from "@/src/components/SongQueue";
+import NavbarSearchBar from "./NavbarSearchBar";
 
 export default function Navbar({ className }: { className?: string }) {
-    const [search, setSearch] = useState("")
-    const [searchMode, setSearchMode] = useState<SearchMode>("local")
     const [showQueue, setShowQueue] = useState<boolean>(false)
-
-    const router = useRouter()
     const path = usePathname()
 
     useEffect(() => {
-        setSearchMode("local")
         setShowQueue(false)
     }, [path])
 
@@ -43,29 +36,7 @@ export default function Navbar({ className }: { className?: string }) {
                 </Link>
 
                 {/* Search Bar in Navbar */}
-                <div className="min-w-10 max-w-80 sm:max-w-130 flex-1 max gap-1 sm:gap-3 flex border rounded-2xl">
-                    <input type="text" 
-                        title="Search a song"
-                        placeholder="Search"
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                        onKeyUp={e => e.key === "Enter" && router.push(`/search/${searchMode}?query=${search}`)}
-                        className="pl-5 min-w-5 flex-1 rounded-l-2xl"
-                    />
-
-                    <button className="my-2 px-1 bg-foreground text-background hover:bg-(--red-clr) hover:text-white transition-colors"
-                        onClick={_ => setSearchMode(p => p === "local" ? "online" : "local")}
-                        title={`Is set to ${searchMode} search`}
-                    >
-                        {capsWord(searchMode)}
-                    </button>
-
-                    <Link href={`/search/${searchMode}?query=${search}`}
-                        className="w-[10%] max-w-20 min-w-7 flex justify-center items-center rounded-r-2xl text-foreground hover:bg-(--light-gray-clr) bg-(--gray-clr)"
-                    >
-                        <SearchIcon className="w-7 h-7" />
-                    </Link>
-                </div>
+                <NavbarSearchBar />
 
                 {/* User Tools */}
                 <div>
