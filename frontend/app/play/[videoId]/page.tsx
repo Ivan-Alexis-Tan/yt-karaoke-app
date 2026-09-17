@@ -11,11 +11,10 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
     const videoId = (await params).videoId;
     const videoDetails = await getVideo(videoId)
     const randomVideos = await getRandomVideos()
-    // await cacheToHistory(videoId)
+    await cacheToHistory(videoId)
 
-    console.log(`videoDetails =`, videoDetails)
     return (
-        <div className="lg:h-[calc(100vh-80px)]">
+        <div className="h-[calc(100vh-75px)] sm:h-[calc(100vh-87px)] md:sm:h-[calc(100vh-75px)]">
             <MainPlayer 
                 videoId={videoId}
                 videoList={randomVideos}
