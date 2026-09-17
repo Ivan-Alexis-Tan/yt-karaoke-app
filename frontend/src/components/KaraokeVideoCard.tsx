@@ -82,7 +82,7 @@ export default function KaraokeVideoCard({
                     </div>
                 </div>
 
-                <div className="m-1.5 gap-1 flex flex-col justify-center text-white">
+                <div className="m-1.5 gap-1 flex flex-col justify-center text-white *:text-ellipsis *:overflow-hidden">
                     <h3 className="text-xl font-bold">{video_title}</h3>
                     <p>{channel_title}</p>
                 </div>
