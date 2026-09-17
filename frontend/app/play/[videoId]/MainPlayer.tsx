@@ -69,7 +69,7 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
             </div>
 
             {showPane === "songs"
-                && <div className="overflow-auto">
+                && <div className="mx-5 lg:mx-0 overflow-auto">
                     <ShowVideos className="[&_a.karaoke-video-card]:mx-5 lg:[&_div.karaoke-video-card]:mx-0 lg:[&_div.karaoke-video-card]:mr-5"
                         videoList={videoList} 
                     />
