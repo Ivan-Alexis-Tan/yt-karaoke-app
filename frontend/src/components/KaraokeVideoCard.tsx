@@ -78,7 +78,7 @@ export default function KaraokeVideoCard({
                     />
 
                     <div className="px-0.5 absolute bottom-3 right-3 bg-(--lucent-blk-clr)">
-                        {formatMinutesSeconds(duration_sec)}
+                        {duration_sec ? formatMinutesSeconds(duration_sec) : ""}
                     </div>
                 </div>
 
