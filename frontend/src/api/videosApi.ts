@@ -32,12 +32,14 @@ export async function getVideo(videoId: string) {
 }
 
 // Search Video Fetchers
-export async function searchVideosLocal(query: string) {
+export async function searchVideosLocal(query: string): Promise<VideoListResponse> {
     const params = new URLSearchParams({ query }) 
-    return await fetch(`${BASE_URL}/videos/local?${params.toString()}`)
+    const fetched = await fetch(`${BASE_URL}/videos/local?${params.toString()}`)
+    return await fetched.json()
 }
 
-export async function searchVideosOnline(query: string) {
+export async function searchVideosOnline(query: string): Promise<VideoListResponse> {
     const params = new URLSearchParams({ query }) 
-    return await fetch(`${BASE_URL}/youtube/search?${params.toString()}`)
+    const fetched = await fetch(`${BASE_URL}/youtube/search?${params.toString()}`)
+    return await fetched.json()
 }

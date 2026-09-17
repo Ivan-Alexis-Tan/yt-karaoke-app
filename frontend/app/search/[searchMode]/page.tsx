@@ -14,9 +14,9 @@ export default async function SearchPage({ searchParams, params }: SearchPagePro
     const { query } = await searchParams;
 
     async function generateSearch(): Promise<VideoListResponse> {
-        if (searchMode === "local") return await (await searchVideosLocal(query)).json();
+        if (searchMode === "local") return await searchVideosLocal(query);
 
-        return await (await searchVideosOnline(query)).json()
+        return await searchVideosOnline(query)
     }
 
     const searchResults = await generateSearch()
