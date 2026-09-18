@@ -9,18 +9,24 @@ import KaraokeMicIcon from "@/src/svgs/KaraokeMicIcon";
 import QueueIcon from "@/src/svgs/QueueIcon";
 import SongQueue from "@/src/components/SongQueue";
 import NavbarSearchBar from "./NavbarSearchBar";
+import useCurrentVideo, { currentSongSelector } from "@/src/utils/useCurrentVideo";
+import PlayIcon from "@/src/svgs/PlayIcon";
 
 export default function Navbar({ className }: { className?: string }) {
     const [showQueue, setShowQueue] = useState<boolean>(false)
     const path = usePathname()
-
+    const currentSong = useCurrentVideo(currentSongSelector)
+    
     useEffect(() => {
         setShowQueue(false)
     }, [path])
 
+    const currentPage = path.split("/")[1]
+    const currentSongTitle = currentSong && ("video_title" in currentSong ? currentSong.video_title : "")
+     
     return (
         <nav className={`${className ?? ""}`}>
-            <div className="gap-3 sm:gap-6 flex justify-between items-center">
+            <div className="gap-3 sm:gap-10 flex justify-between items-center">
                 {/* Brand Name and Home Link */}
                 <Link href={"/"}
                     className="text-(--red-clr) min-w-11 min-h-11 hover:text-foreground"
@@ -31,12 +37,25 @@ export default function Navbar({ className }: { className?: string }) {
                             <YoutubeIcon className="w-10 h-10" />
                             <KaraokeMicIcon className="w-6 h-6 absolute bottom-1 right-0" />
                         </div>
-                        <p className="hidden sm:block">Karaoke App</p>
+                        <p className="hidden sm:block text-center">Karaoke App</p>
                     </h2>
                 </Link>
 
                 {/* Search Bar in Navbar */}
-                <NavbarSearchBar />
+                {currentPage === "play"
+                    ? <div className="min-w-0 flex-1 flex justify-center items-center"
+                        title={currentSongTitle ?? ""}
+                        onClick={_ => window.scrollTo({ top: 0, behavior: "smooth" })}
+                    >
+                        <div>
+                            <PlayIcon className="w-10 h-10 text-(--red-clr)" />
+                        </div>
+                        <h3 className="text-xl font-bold whitespace-nowrap text-ellipsis overflow-hidden">
+                            {currentSongTitle}
+                        </h3>
+                    </div>
+                    : <NavbarSearchBar />
+                }
 
                 {/* User Tools */}
                 <div>
