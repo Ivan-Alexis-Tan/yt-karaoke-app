@@ -11,3 +11,4 @@ type VideoListResponse = {
 }[]
 
 type SearchMode = "local" | "online"
+type VideoIdType = VideoListResponse[number]["video_id"]
