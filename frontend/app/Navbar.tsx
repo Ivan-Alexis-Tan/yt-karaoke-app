@@ -1,33 +1,32 @@
 "use client"
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { capsWord } from "@/src/utils/helpers";
-
-import SearchIcon from "@/src/svgs/SearchIcon";
 import YoutubeIcon from "@/src/svgs/YoutubeIcon";
 import KaraokeMicIcon from "@/src/svgs/KaraokeMicIcon";
 import QueueIcon from "@/src/svgs/QueueIcon";
 import SongQueue from "@/src/components/SongQueue";
+import NavbarSearchBar from "./NavbarSearchBar";
+import useCurrentVideo, { currentSongSelector } from "@/src/utils/useCurrentVideo";
+import PlayIcon from "@/src/svgs/PlayIcon";
 
 export default function Navbar({ className }: { className?: string }) {
-    const [search, setSearch] = useState("")
-    const [searchMode, setSearchMode] = useState<SearchMode>("local")
     const [showQueue, setShowQueue] = useState<boolean>(false)
-
-    const router = useRouter()
     const path = usePathname()
-
+    const currentSong = useCurrentVideo(currentSongSelector)
+    
     useEffect(() => {
-        setSearchMode("local")
         setShowQueue(false)
     }, [path])
 
+    const currentPage = path.split("/")[1]
+    const currentSongTitle = currentSong && ("video_title" in currentSong ? currentSong.video_title : "")
+     
     return (
         <nav className={`${className ?? ""}`}>
-            <div className="gap-3 sm:gap-6 flex justify-between items-center">
+            <div className="gap-3 sm:gap-10 flex justify-between items-center">
                 {/* Brand Name and Home Link */}
                 <Link href={"/"}
                     className="text-(--red-clr) min-w-11 min-h-11 hover:text-foreground"
@@ -38,34 +37,25 @@ export default function Navbar({ className }: { className?: string }) {
                             <YoutubeIcon className="w-10 h-10" />
                             <KaraokeMicIcon className="w-6 h-6 absolute bottom-1 right-0" />
                         </div>
-                        <p className="hidden sm:block">Karaoke App</p>
+                        <p className="hidden sm:block text-center">Karaoke App</p>
                     </h2>
                 </Link>
 
                 {/* Search Bar in Navbar */}
-                <div className="min-w-10 max-w-80 sm:max-w-130 flex-1 max gap-1 sm:gap-3 flex border rounded-2xl">
-                    <input type="text" 
-                        title="Search a song"
-                        placeholder="Search"
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                        onKeyUp={e => e.key === "Enter" && router.push(`/search/${searchMode}?query=${search}`)}
-                        className="pl-5 min-w-5 flex-1 rounded-l-2xl"
-                    />
-
-                    <button className="my-2 px-1 bg-foreground text-background hover:bg-(--red-clr) hover:text-white transition-colors"
-                        onClick={_ => setSearchMode(p => p === "local" ? "online" : "local")}
-                        title={`Is set to ${searchMode} search`}
+                {currentPage === "play"
+                    ? <div className="min-w-0 flex-1 flex justify-center items-center"
+                        title={currentSongTitle ?? ""}
+                        onClick={_ => window.scrollTo({ top: 0, behavior: "smooth" })}
                     >
-                        {capsWord(searchMode)}
-                    </button>
-
-                    <Link href={`/search/${searchMode}?query=${search}`}
-                        className="w-[10%] max-w-20 min-w-7 flex justify-center items-center rounded-r-2xl text-foreground hover:bg-(--light-gray-clr) bg-(--gray-clr)"
-                    >
-                        <SearchIcon className="w-7 h-7" />
-                    </Link>
-                </div>
+                        <div>
+                            <PlayIcon className="w-10 h-10 text-(--red-clr)" />
+                        </div>
+                        <h3 className="text-xl font-bold whitespace-nowrap text-ellipsis overflow-hidden">
+                            {currentSongTitle}
+                        </h3>
+                    </div>
+                    : <NavbarSearchBar />
+                }
 
                 {/* User Tools */}
                 <div>

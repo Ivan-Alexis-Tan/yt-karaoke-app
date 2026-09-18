@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import useSongQueue, { songQueueSelector, deleteSongQueueSelector } from "@/src/utils/useSongQueue";
 
@@ -10,6 +10,8 @@ import SongNoteIcon from "@/src/svgs/SongNoteIcon";
 import SearchIcon from "@/src/svgs/SearchIcon";
 import HideIcon from "@/src/svgs/HideIcon";
 import NextSongControl from "./NextSongControl";
+import VideoSearch from "./VideoSearch";
+import useCurrentVideo, { addCurrentSongSelector } from "@/src/utils/useCurrentVideo";
 
 type MainPlayerProps = {
     videoId: string
@@ -17,13 +19,18 @@ type MainPlayerProps = {
     className?: string 
 }
 
-type PaneKeys = "none" | "songs" | "search"
+type PaneKeys = "hide" | "songs" | "search"
 
 export default function MainPlayer({ videoId, videoList, className }: MainPlayerProps) {
     const [showPane, setShowPane] = useState<PaneKeys>("songs")
+    const currentVideo = useCurrentVideo(addCurrentSongSelector)
 
     const songQueue = useSongQueue(songQueueSelector)
     const deleteSongQueue = useSongQueue(deleteSongQueueSelector)
+
+    useEffect(() => {
+        currentVideo(videoId)
+    }, [])
 
     const RightPaneControls = ({ className }: { className?: string }) => {
         return (
@@ -42,8 +49,8 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
                     <p>Songs</p>
                 </button>
 
-                <button onClick={_ => setShowPane("none")}
-                    className={`${showPane === "none" && "bg-foreground text-background"} px-1 border border-background rounded hover:text-(--red-clr)`}
+                <button onClick={_ => setShowPane("hide")}
+                    className={`${showPane === "hide" && "bg-foreground text-background"} px-1 border border-background rounded hover:text-(--red-clr)`}
                 >
                     <HideIcon className="w-7 h-7" />
                     <p>Hide</p>
@@ -53,11 +60,13 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
     }
 
     return (
-        <div className={`${className ?? ""} ${showPane !== "none" && "gap-3 grid grid-cols-1 lg:grid-cols-[2fr_1fr]"}`}>
-            <div>
-                <KaraokePlayer videoId={videoId} />
+        <div className={`${className ?? ""} 
+            ${showPane !== "hide" && "gap-3 grid lg:grid-cols-[2fr_1fr]"}`}
+        >
+            <div className="min-w-0">
+                <KaraokePlayer videoId={videoId} className="mb-5" />
 
-                <div className="mb-5 mx-5 gap-6 flex flex-col sm:flex-row justify-between">
+                <div className="mx-5 gap-3 flex flex-col sm:flex-row justify-between">
                     <NextSongControl 
                         songQueue={songQueue}
                         deleteSongQueue={deleteSongQueue}
@@ -69,7 +78,7 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
             </div>
 
             {showPane === "songs"
-                && <div className="mx-5 lg:mx-0 overflow-auto">
+                && <div className="mx-5 lg:mx-0 lg:overflow-auto">
                     <ShowVideos className="[&_a.karaoke-video-card]:mx-5 lg:[&_div.karaoke-video-card]:mx-0 lg:[&_div.karaoke-video-card]:mr-5"
                         videoList={videoList} 
                     />
@@ -77,9 +86,7 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
             }
 
             {showPane === "search"
-                && <div>
-
-                </div>
+                && <VideoSearch className="ml-5 lg:ml-0"/>
             }
         </div>
     )

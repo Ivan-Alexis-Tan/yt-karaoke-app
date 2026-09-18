@@ -41,7 +41,7 @@ def parse_yt_search(data: dict):
         data: dict = {
             "position": idx,
             "video_id": item["id"]["videoId"],
-            "title": snippet["title"],
+            "video_title": snippet["title"],
             "channel_id": snippet["channelId"],
             "channel_title": snippet["channelTitle"],
             "thumbnail_url": thumbnail["url"],
@@ -77,7 +77,7 @@ def parse_yt_video_list(video_list: dict):
 
         parsed_list.append({
             "video_id": video["id"],
-            "title": snippet["title"],
+            "video_title": snippet["title"],
             "thumbnail_url": thumbnail["url"],
             "thumbnail_width": thumbnail["width"],
             "thumbnail_height": thumbnail["height"],
@@ -172,7 +172,7 @@ async def async_cache_yt_search(
             
             new_video_rows.append(models.Video(
                 video_id = video["video_id"],
-                title = video["title"],
+                title = video["video_title"],
                 channel_id = video["channel_id"],
                 thumbnail_url = video["thumbnail_url"],
                 thumbnail_width = video["thumbnail_width"],
