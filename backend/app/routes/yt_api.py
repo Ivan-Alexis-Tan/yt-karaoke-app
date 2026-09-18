@@ -9,6 +9,7 @@ from app.cache.helpers import async_cache_yt_search, parse_yt_search, ytSearchRe
 from app.db import db_dependency
 from app.models import models
 from app.schema import responses as response_schema
+from app.schema.helpers import mapVideoListResponse
 
 yt_router = APIRouter(prefix="/api/youtube", tags=["youtube"])
 
@@ -28,17 +29,7 @@ async def yt_search(query: str, db: db_dependency, bg_task: BackgroundTasks):
         ).filter(models.SearchCacheVideo.search_id == exists.id).all()
 
         return [
-            response_schema.VideoListResponse(
-                position=cache.position,
-                video_id=cache.video_id,
-                video_title=cache.video.title,
-                channel_id=cache.video.channel.channel_id,
-                channel_title=cache.video.channel.name,
-                thumbnail_url=cache.video.thumbnail_url,
-                thumbnail_width=cache.video.thumbnail_width,
-                thumbnail_height=cache.video.thumbnail_height,
-                duration_sec=cache.video.duration_sec
-            )
+            mapVideoListResponse(cache)
             for cache in db_returned
         ]
 
@@ -77,16 +68,6 @@ async def yt_search(query: str, db: db_dependency, bg_task: BackgroundTasks):
     )
 
     return [
-        response_schema.VideoListResponse(
-            position=video["position"],
-            video_id=video["video_id"],
-            video_title=video["title"],
-            channel_id=video["channel_id"],
-            channel_title=video["channel_title"],
-            thumbnail_url=video["thumbnail_url"],
-            thumbnail_width=video["thumbnail_width"],
-            thumbnail_height=video["thumbnail_height"],
-            duration_sec=None
-        )
+        mapVideoListResponse(video)
         for video in parsed
     ]

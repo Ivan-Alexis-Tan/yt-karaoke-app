@@ -13,6 +13,7 @@ from app.schema import responses as response_schema
 from app.utils import yt_fetchers
 from app.cache.helpers import parse_yt_video_list
 from app.cache import cache, cache_data
+from app.schema.helpers import mapVideoListResponse
 
 videos_router = APIRouter(prefix="/api/videos", tags=["videos"])
 
@@ -28,16 +29,7 @@ async def get_random_videos(db: db_dependency, payload: request_schema.GetRandVi
     pulled = db.execute(stmt).scalars().all()
 
     rand_vids = [
-        response_schema.VideoListResponse(
-            video_id=video.video_id,
-            video_title=video.title,
-            channel_id=video.channel_id,
-            channel_title=video.channel.name,
-            thumbnail_url=video.thumbnail_url,
-            thumbnail_width=video.thumbnail_width,
-            thumbnail_height=video.thumbnail_height,
-            duration_sec=video.duration_sec,
-        )
+        mapVideoListResponse(video)
         for video in pulled
     ]
 
@@ -62,26 +54,22 @@ async def search_local(query: str, db: db_dependency):
     ).scalars().all()
 
     return [
-        response_schema.VideoListResponse(
-            video_id=video.video_id,
-            video_title=video.title,
-            channel_id=video.channel_id,
-            channel_title=video.channel.name,
-            thumbnail_url=video.thumbnail_url,
-            thumbnail_width=video.thumbnail_width,
-            thumbnail_height=video.thumbnail_height,
-            duration_sec=video.duration_sec,
-        )
+        mapVideoListResponse(video)
         for video in query
     ]
 
 
-@videos_router.get("/{video_id}")
+@videos_router.get("/{video_id}", response_model=response_schema.VideoListResponse)
 async def get_video(video_id: str, db: db_dependency, bg_task: BackgroundTasks):
-    in_db = db.query(models.Video).filter(models.Video.video_id == video_id).first()
+    in_db = (
+        db.query(models.Video)
+        .options(selectinload(models.Video.channel))
+        .filter(models.Video.video_id == video_id)
+        .first()
+    )
 
     if in_db:
-        return in_db
+        return mapVideoListResponse(in_db)
 
     fetched = await yt_fetchers.req_yt_video(video_id)
     parsed = parse_yt_video_list(fetched)
@@ -92,7 +80,7 @@ async def get_video(video_id: str, db: db_dependency, bg_task: BackgroundTasks):
         db=db,
     )
 
-    return parsed
+    return mapVideoListResponse(parsed)
 
 
 @videos_router.post("/next_video", status_code=status.HTTP_201_CREATED)
