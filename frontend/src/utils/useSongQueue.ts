@@ -1,16 +1,14 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-type VideoIdType = VideoListResponse[number]["video_id"]
-
-type useSongQueueStates = {
+type UseSongQueueStates = {
     songQueue: VideoListResponse
     addSongQueue: (video: VideoListResponse[number]) => void
     deleteSongQueue: (video_id: VideoIdType) => void
     emptySongQueue: () => void
 }
 
-export const useSongQueue = create<useSongQueueStates>()(
+export const useSongQueue = create<UseSongQueueStates>()(
     persist(
         (set) => ({
             songQueue: [],
@@ -26,9 +24,9 @@ export const useSongQueue = create<useSongQueueStates>()(
     )
 )
 
-export const songQueueSelector = (state: useSongQueueStates) => state.songQueue
-export const addSongQueueSelector = (state: useSongQueueStates) => state.addSongQueue
-export const deleteSongQueueSelector = (state: useSongQueueStates) => state.deleteSongQueue
-export const emptySongQueueSelector = (state: useSongQueueStates) => state.emptySongQueue
+export const songQueueSelector = (state: UseSongQueueStates) => state.songQueue
+export const addSongQueueSelector = (state: UseSongQueueStates) => state.addSongQueue
+export const deleteSongQueueSelector = (state: UseSongQueueStates) => state.deleteSongQueue
+export const emptySongQueueSelector = (state: UseSongQueueStates) => state.emptySongQueue
 
 export default useSongQueue;
