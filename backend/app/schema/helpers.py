@@ -14,7 +14,7 @@ def mapVideoListResponse(video: dict | models.Video) -> VideoListResponse:
             duration_sec=video.duration_sec,
         )
 
-    vid_duration = video["duration_sec"] if video["duration_sec"] in video.keys() else None
+    vid_duration = video["duration_sec"] if "duration_sec" in video.keys() else None
     return VideoListResponse(
         video_id=video["video_id"],
         video_title=video["video_title"],
