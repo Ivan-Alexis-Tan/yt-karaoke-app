@@ -49,3 +49,17 @@ input:focus-visible {
   background-color: var(--light-gray-clr);
   border: none;
 }
+
+/* Player Next Song Button */
+.next-song-container:hover {
+  .next-song-btn {
+    background-color: var(--color-green-400);
+    border-color: var(--color-green-400);
+    color: var(--background);
+  }
+
+  .next-song-title {
+    text-decoration: underline var(--color-green-400);
+    text-underline-offset: 6px;
+  }
+}

@@ -23,31 +23,27 @@ export default function NextSongControl({ songQueue, deleteSongQueue, className 
 
     }, [songQueue])
     
-    return (
-        <div className={`${className ?? ""} min-w-0 flex items-center`}>
-            {nextSong !== null
-                ? <>
-                    <Link href={`/play/${nextSong["video_id"]}`}
-                        onClick={_ => {
-                            deleteSongQueue(nextSong["video_id"])
-                        }}
-                        className="hover:bg-green-400 hover:border-green-400 hover:text-background border rounded"
-                        title={`Next song: ${nextSong["video_title"]}`}
-                    >
-                        <NextSongIcon className="w-7 h-7" />
-                    </Link>
+    if (nextSong !== null) return (
+        <Link className={`${className ?? ""} next-song-container min-w-0 flex items-center`}
+            href={`/play/${nextSong["video_id"]}`}
+            onClick={_ => {
+                deleteSongQueue(nextSong["video_id"])
+            }}
+            title={`Next song: ${nextSong["video_title"]}`}
+        >
+            <NextSongIcon className="next-song-btn w-7 h-7 shrink-0 border rounded" />
 
-                    <p className="py-0.5 px-2 whitespace-nowrap text-ellipsis overflow-hidden"
-                        title={`${nextSong["video_title"]}`}
-                    >
-                        <span className="font-bold text-green-400">NEXT:</span> {nextSong["video_title"]}
-                    </p>
-                </>
-                : <div className="flex gap-1 items-center">
-                    <NoSongOnQueueIcon className="w-7 h-7 text-(--red-clr)" />
-                    <p>No song on queue</p>
-                </div>
-            }
+            <p className="next-song-title py-0.5 px-2 whitespace-nowrap text-ellipsis overflow-hidden"
+                title={`${nextSong["video_title"]}`}
+            >
+                <span className="font-bold text-green-400">NEXT:</span> {nextSong["video_title"]}
+            </p>
+        </Link>
+    );
+    else return (
+        <div className={`${className ?? ""} flex gap-1 items-center`}>
+            <NoSongOnQueueIcon className="w-7 h-7 text-(--red-clr)" />
+            <p>No song on queue</p>
         </div>
     )
 }

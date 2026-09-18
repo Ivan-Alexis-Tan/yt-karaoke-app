@@ -70,7 +70,6 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
                     <NextSongControl 
                         songQueue={songQueue}
                         deleteSongQueue={deleteSongQueue}
-                        className="flex-1"
                     />
 
                     <RightPaneControls className="gap-3 flex justify-end" />
