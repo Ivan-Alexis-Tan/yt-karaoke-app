@@ -9,10 +9,10 @@ type KaraokePlayerProps = {
 export default function KaraokePlayer({ videoId, className }: KaraokePlayerProps) {
     return (
         <div className={`${className ?? ""}`}>
-            <iframe src={`http://www.youtube.com/embed/${videoId}?autoplay=1`}
+            <iframe src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
                 allow="autoplay"
                 allowFullScreen
-                className="mb-5 max-h-130 w-full aspect-video"
+                className="max-h-130 w-full aspect-video"
             ></iframe>
         </div>
     )
