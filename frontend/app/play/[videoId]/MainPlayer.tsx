@@ -55,9 +55,9 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
 
     return (
         <div className={`${className ?? ""} 
-            ${showPane !== "hide" && "gap-3 flex flex-col lg:grid lg:grid-cols-[2fr_1fr]"}`}
+            ${showPane !== "hide" && "gap-3 grid lg:grid-cols-[2fr_1fr]"}`}
         >
-            <div>
+            <div className="min-w-0">
                 <KaraokePlayer videoId={videoId} className="mb-5" />
 
                 <div className="mx-5 gap-3 flex flex-col sm:flex-row justify-between">
@@ -80,7 +80,7 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
             }
 
             {showPane === "search"
-                && <VideoSearch className="flex-1"/>
+                && <VideoSearch className="ml-5 lg:ml-0"/>
             }
         </div>
     )

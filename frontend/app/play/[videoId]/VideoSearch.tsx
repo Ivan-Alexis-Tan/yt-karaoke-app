@@ -44,7 +44,7 @@ export default function VideoSearch({ className }: VideoSearchProps) {
 
     return (
         <div className={`${className ?? ""} flex flex-col lg:overflow-auto`}>
-            <SearchBar 
+            <SearchBar className="mb-3"
                 search={search} 
                 setSearchFn={setSearch} 
                 searchMode={searchMode} 
