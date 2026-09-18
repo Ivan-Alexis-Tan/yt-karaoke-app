@@ -73,7 +73,11 @@ export default function VideoSearch({ className }: VideoSearchProps) {
                                         />
                                     ))}
                                 </div>
-                                : <CenterText text={`"${search}" not found`} />
+                                : (
+                                    searchMode === "local"
+                                        ? <CenterText text={`"${search}" not found`} />
+                                        : <CenterText text={`Pressing "Enter" to start searching`} />
+                                )
                         )
                 )
             }
