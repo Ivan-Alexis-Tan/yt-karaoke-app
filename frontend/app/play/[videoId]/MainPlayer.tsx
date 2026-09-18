@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import useSongQueue, { songQueueSelector, deleteSongQueueSelector } from "@/src/utils/useSongQueue";
 
@@ -11,6 +11,7 @@ import SearchIcon from "@/src/svgs/SearchIcon";
 import HideIcon from "@/src/svgs/HideIcon";
 import NextSongControl from "./NextSongControl";
 import VideoSearch from "./VideoSearch";
+import useCurrentVideo, { addCurrentSongSelector } from "@/src/utils/useCurrentVideo";
 
 type MainPlayerProps = {
     videoId: string
@@ -22,9 +23,14 @@ type PaneKeys = "hide" | "songs" | "search"
 
 export default function MainPlayer({ videoId, videoList, className }: MainPlayerProps) {
     const [showPane, setShowPane] = useState<PaneKeys>("songs")
+    const currentVideo = useCurrentVideo(addCurrentSongSelector)
 
     const songQueue = useSongQueue(songQueueSelector)
     const deleteSongQueue = useSongQueue(deleteSongQueueSelector)
+
+    useEffect(() => {
+        currentVideo(videoId)
+    }, [])
 
     const RightPaneControls = ({ className }: { className?: string }) => {
         return (
