@@ -47,7 +47,7 @@ input:focus {
   outline: none;
 }
 
-input:focus-visible {
+main input:focus-visible {
   background-color: var(--light-gray-clr);
   border: none;
 }
