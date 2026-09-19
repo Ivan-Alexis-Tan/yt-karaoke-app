@@ -10,5 +10,4 @@ type VideoListResponse = {
     duration_sec?: number
 }[]
 
-type SearchMode = "local" | "online"
 type VideoIdType = VideoListResponse[number]["video_id"]
