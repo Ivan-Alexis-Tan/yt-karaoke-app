@@ -1,11 +1,14 @@
 "use client";
 
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+
 import { searchVideosLocal, searchVideosOnline } from "@/src/api/videosApi";
+import { SearchMode } from "@/src/types/states";
+import { capsWord } from "@/src/utils/helpers";
+
 import KaraokeVideoCard from "@/src/components/KaraokeVideoCard";
 import Spinner from "@/src/components/Spinner";
 import SearchIcon from "@/src/svgs/SearchIcon";
-import { capsWord } from "@/src/utils/helpers";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 type VideoSearchProps = {
     className?: string
