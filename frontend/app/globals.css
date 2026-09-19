@@ -65,3 +65,21 @@ main input:focus-visible {
     text-underline-offset: 6px;
   }
 }
+
+.player-video-karaoke {
+  .karaoke-video-card a {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+
+    @media(width >= 490px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr))
+    };
+
+    @media(width >= 1024) {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+
+    @media(width >= 1460px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr))
+    };
+  }
+}
