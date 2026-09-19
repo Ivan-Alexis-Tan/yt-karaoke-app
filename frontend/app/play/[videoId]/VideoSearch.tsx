@@ -74,8 +74,9 @@ export default function VideoSearch({ className }: VideoSearchProps) {
                         ? <CenterText text={`Search song ${searchMode === "local" ? "on local" : searchMode}`} />
                         : (
                             videoList.length >= 1
-                                ? <div className="mr-5">
+                                ? <div className="player-video-karaoke">
                                     <p>{capsWord(searchMode)} search results:</p>
+
                                     {videoList.map(vid => (
                                         <KaraokeVideoCard key={vid.video_id}
                                             video_id={vid.video_id}
@@ -86,6 +87,7 @@ export default function VideoSearch({ className }: VideoSearchProps) {
                                             thumbnail_height={vid.thumbnail_height}
                                             thumbnail_width={vid.thumbnail_width}
                                             duration_sec={vid.duration_sec as number}
+                                            className="mx-auto max-w-200 lg:max-w-"
                                         />
                                     ))}
                                 </div>
@@ -148,7 +150,7 @@ const SearchBar = ({
                     if (e.key !== "Enter") return
                     fetchVideos()
                 }}
-                className="flex-1 mr-5 px-2 border-b"
+                className="min-w-0 flex-1 px-2 border-b"
             />
         </div>
     )

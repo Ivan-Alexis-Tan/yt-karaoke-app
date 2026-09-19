@@ -20,7 +20,7 @@ export default function ShowVideos({ videoList, arrange_videos = "row", classNam
     
     return (
         <>
-            <div className={`${className ?? ""}`}>
+            <div className={`${className ?? ""} player-video-karaoke`}>
                 {paginated.map(page => page.map(vid => (
                     <KaraokeVideoCard key={vid.video_id}
                         video_id={vid.video_id}
@@ -32,6 +32,7 @@ export default function ShowVideos({ videoList, arrange_videos = "row", classNam
                         thumbnail_height={vid.thumbnail_height}
                         duration_sec={vid.duration_sec as number}
                         arrange={arrange_videos}
+                        className="mx-auto max-w-200 lg:max-w-"
                     />
                 )))}
             </div>
