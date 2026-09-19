@@ -4,6 +4,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react"
 import Link from "next/link";
 
+import { SearchMode } from "@/src/types/states";
+
 import { capsWord } from "@/src/utils/helpers";
 
 import SearchIcon from "@/src/svgs/SearchIcon";
