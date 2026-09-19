@@ -11,11 +11,13 @@ import SongQueue from "@/src/components/SongQueue";
 import NavbarSearchBar from "./NavbarSearchBar";
 import useCurrentVideo, { currentSongSelector } from "@/src/utils/useCurrentVideo";
 import PlayIcon from "@/src/svgs/PlayIcon";
+import useSongQueue, { songQueueSelector } from "@/src/utils/useSongQueue";
 
 export default function Navbar({ className }: { className?: string }) {
     const [showQueue, setShowQueue] = useState<boolean>(false)
     const path = usePathname()
     const currentSong = useCurrentVideo(currentSongSelector)
+    const songQueue = useSongQueue(songQueueSelector)
     
     useEffect(() => {
         setShowQueue(false)
@@ -60,12 +62,18 @@ export default function Navbar({ className }: { className?: string }) {
                 {/* User Tools */}
                 <div>
                     {/* <MenuIcon className="w-10 h-10 sm:hidden" /> */}
-                    <button onClick={_ => setShowQueue(p => !p)}
-                        title={`${showQueue ? "Close" : "Open"} song queue`}
-                        className={`${showQueue && "bg-(--red-clr) border-(--red-clr)"} px-1 border rounded-xl`}
-                    >
-                        <QueueIcon className="w-10 h-10" />
-                    </button>
+                    <div className="relative mr-2 flex justify-center items-center">
+                        <button onClick={_ => setShowQueue(p => !p)}
+                            title={`${showQueue ? "Close" : "Open"} song queue`}
+                            className={`${showQueue && "bg-(--red-clr) border-(--red-clr)"} px-1 border rounded-xl`}
+                        >
+                            <QueueIcon className="w-10 h-10" />
+                        </button>
+
+                        <div className="absolute top-[-7] right-[-7] w-5 h-5 flex justify-center items-center text-black bg-green-400 rounded-full">
+                            {songQueue.length}
+                        </div>
+                    </div>
                 </div>
 
                 {showQueue 
