@@ -25,10 +25,11 @@ export default function SongQueue({ closeFn, className }: SongQueueParams) {
     const emptySongQueue = useSongQueue(emptySongQueueSelector)
 
     return (
+        // Popup Window of Song Queue on Navbar
         <div className={`${className ?? ""} max-w-150 w-[60%] h-[calc(100vh-4.5rem)] fixed right-0 top-18 rounded-l-xl bg-(--gray-clr) overflow-auto`}>
             {songQueue.length >= 1
                 ? <div className="relative">
-                    <div className="gap-3 sticky top-0 right-0 z-(--z-navbar) bg-(--gray-clr) flex justify-end">
+                    <div className="gap-3 sticky top-0 right-0 z-(--z-pop-sidebar) bg-(--gray-clr) flex justify-end">
                         <button onClick={_ => setPopupWindow(true)} className="hover:text-(--red-clr)">
                             <EmptyQueueIcon className="w-7 h-7" />
                         </button>
@@ -80,6 +81,7 @@ export default function SongQueue({ closeFn, className }: SongQueueParams) {
                 </div>
             }
 
+            {/* Confirm Delete Popup Window of Song Queue */}
             {popupWindow && <ConfirmDeletePopup popupFn={setPopupWindow} emptySongQueue={emptySongQueue} />}
         </div>
     )
