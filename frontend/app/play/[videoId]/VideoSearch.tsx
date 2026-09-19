@@ -6,6 +6,8 @@ import { searchVideosLocal, searchVideosOnline } from "@/src/api/videosApi";
 import { SearchMode } from "@/src/types/states";
 import { capsWord } from "@/src/utils/helpers";
 
+import useCurrentVideo, { searchKeySelector, updateSearchKeySelector, updateVideoListSelector, videoListSelector } from "@/src/utils/useCurrentVideo";
+
 import KaraokeVideoCard from "@/src/components/KaraokeVideoCard";
 import Spinner from "@/src/components/Spinner";
 import SearchIcon from "@/src/svgs/SearchIcon";
@@ -16,19 +18,24 @@ type VideoSearchProps = {
 
 export default function VideoSearch({ className }: VideoSearchProps) {
     const [search, setSearch] = useState<string>("")
-    const [videoList, setVideoList] = useState<VideoListResponse>([])
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [searchMode, setSearchMode] = useState<SearchMode>("local")
+
+    const videoList = useCurrentVideo(videoListSelector)
+    const searchKey = useCurrentVideo(searchKeySelector)
+    const updateVideoList = useCurrentVideo(updateVideoListSelector)
+    const updateSearchKey = useCurrentVideo(updateSearchKeySelector)
 
     useEffect(() => {
         if (!search || searchMode === "online") return
         setIsLoading(true)
+        updateSearchKey(search)
 
         async function fetchVideos() {
             const fetched = await searchVideosLocal(search)
             
             if (isLoading) {
-                setVideoList(fetched)
+                updateVideoList(fetched)
                 setIsLoading(false)
             };
         }
@@ -40,7 +47,8 @@ export default function VideoSearch({ className }: VideoSearchProps) {
         setIsLoading(true)
         const fetched = await searchVideosOnline(search)
         
-        setVideoList(fetched)
+        updateVideoList(fetched)
+        updateSearchKey(search)
         setSearchMode("local")
         setIsLoading(false)
     }
@@ -53,16 +61,18 @@ export default function VideoSearch({ className }: VideoSearchProps) {
                 searchMode={searchMode} 
                 setSearchModeFn={setSearchMode}
                 searchOnlineFn={fetchOnline}
+                searchKey={searchKey}
             />
 
             {isLoading
                 ? <CenterText text={<Spinner />} />
                 : (
-                    search === ""
+                    search === "" && videoList.length === 0
                         ? <CenterText text={`Search song ${searchMode === "local" ? "on local" : searchMode}`} />
                         : (
                             videoList.length >= 1
                                 ? <div className="mr-5">
+                                    <p>{capsWord(searchMode)} search results:</p>
                                     {videoList.map(vid => (
                                         <KaraokeVideoCard key={vid.video_id}
                                             video_id={vid.video_id}
@@ -102,6 +112,7 @@ type SearchBarProp = {
     setSearchModeFn: Dispatch<SetStateAction<SearchMode>>
     searchMode: SearchMode
     searchOnlineFn: () => void
+    searchKey: string
     className?: string
 }
 
@@ -111,6 +122,7 @@ const SearchBar = ({
     setSearchModeFn, 
     searchMode,
     searchOnlineFn,
+    searchKey,
     className
 }: SearchBarProp) => {
     const isLocalSearch = searchMode === "local"
@@ -134,13 +146,13 @@ const SearchBar = ({
             {isLocalSearch
                 ? <input type="text" 
                     title="Local search"
-                    placeholder="Local search"
+                    placeholder={`${searchKey !== "" ? searchKey : "Local search"}`}
                     value={search}
                     onChange={e => setSearchFn(e.target.value)}
                     className="flex-1 mr-5 px-2 border-b"
                 />
                 : <input type="text" 
-                    placeholder="Online search"
+                    placeholder={`${searchKey !== "" ? searchKey : "Online search"}`}
                     value={search}
                     onChange={e => setSearchFn(e.target.value)}
                     onKeyUp={e => {
