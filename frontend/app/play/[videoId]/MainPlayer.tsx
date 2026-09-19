@@ -88,7 +88,7 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
                 }
 
                 {showPane === "search"
-                    && <VideoSearch className="ml-5 lg:ml-0"/>
+                    && <VideoSearch className="min-w-0 mx-5 lg:mx-0 lg:pr-5"/>
                 }
             </>
         </div>
