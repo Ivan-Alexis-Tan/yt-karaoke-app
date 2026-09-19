@@ -63,6 +63,7 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
         <div className={`${className ?? ""} 
             ${showPane !== "hide" && "gap-3 grid lg:grid-cols-[2fr_1fr]"}`}
         >
+            {/* Left Side Pane */}
             <div className="min-w-0">
                 <KaraokePlayer videoId={videoId} className="mb-5" />
 
@@ -76,17 +77,20 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
                 </div>
             </div>
 
-            {showPane === "songs"
-                && <div className="mx-5 lg:mx-0 lg:overflow-auto">
-                    <ShowVideos className="[&_a.karaoke-video-card]:mx-5 lg:[&_div.karaoke-video-card]:mx-0 lg:[&_div.karaoke-video-card]:mr-5"
-                        videoList={videoList} 
-                    />
-                </div>
-            }
+            {/* Right Side Pane */}
+            <>
+                {showPane === "songs"
+                    && <div className="mx-5 lg:mx-0 lg:overflow-auto">
+                        <ShowVideos className="[&_a.karaoke-video-card]:mx-5 lg:[&_div.karaoke-video-card]:mx-0 lg:[&_div.karaoke-video-card]:mr-5"
+                            videoList={videoList} 
+                        />
+                    </div>
+                }
 
-            {showPane === "search"
-                && <VideoSearch className="ml-5 lg:ml-0"/>
-            }
+                {showPane === "search"
+                    && <VideoSearch className="ml-5 lg:ml-0"/>
+                }
+            </>
         </div>
     )
 }
