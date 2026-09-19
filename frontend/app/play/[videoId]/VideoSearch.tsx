@@ -1,12 +1,17 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 import { searchVideosLocal, searchVideosOnline } from "@/src/api/videosApi";
 import { SearchMode } from "@/src/types/states";
 import { capsWord } from "@/src/utils/helpers";
 
-import useCurrentVideo, { searchKeySelector, updateSearchKeySelector, updateVideoListSelector, videoListSelector } from "@/src/utils/useCurrentVideo";
+import useCurrentVideo, { 
+    searchKeySelector, 
+    updateSearchKeySelector, 
+    updateVideoListSelector, 
+    videoListSelector 
+} from "@/src/utils/useCurrentVideo";
 
 import KaraokeVideoCard from "@/src/components/KaraokeVideoCard";
 import Spinner from "@/src/components/Spinner";
@@ -26,41 +31,39 @@ export default function VideoSearch({ className }: VideoSearchProps) {
     const updateVideoList = useCurrentVideo(updateVideoListSelector)
     const updateSearchKey = useCurrentVideo(updateSearchKeySelector)
 
-    useEffect(() => {
-        if (!search || searchMode === "online") return
-        setIsLoading(true)
-        updateSearchKey(search)
+    async function fetchVideos() {
+        if (!search) return
 
-        async function fetchVideos() {
-            const fetched = await searchVideosLocal(search)
-            
-            if (isLoading) {
-                updateVideoList(fetched)
-                setIsLoading(false)
-            };
+        setIsLoading(true)
+        let fetched
+
+        try {
+            if (searchMode === "local") {
+                fetched = await searchVideosLocal(search)
+            }
+            else {
+                fetched = await searchVideosOnline(search)
+            }
         }
-
-        fetchVideos()
-    }, [search])
-
-    async function fetchOnline() {
-        setIsLoading(true)
-        const fetched = await searchVideosOnline(search)
-        
-        updateVideoList(fetched)
-        updateSearchKey(search)
-        setSearchMode("local")
-        setIsLoading(false)
+        catch(e) { 
+            console.error(e) 
+        }
+        finally {
+            updateVideoList(fetched as VideoListResponse)
+            updateSearchKey(search)
+            setSearchMode("local")
+            setIsLoading(false)
+        }
     }
 
     return (
         <div className={`${className ?? ""} relative flex flex-col lg:overflow-auto`}>
-            <SearchBar className="mb-3 sticky top-17 lg:top-0 z-(--z-sticky) bg-background"
+            <SearchBar className="mb-3 sticky top-17 sm:top-21 md:top-17 lg:top-0 z-(--z-sticky) bg-background"
                 search={search} 
                 setSearchFn={setSearch} 
                 searchMode={searchMode} 
                 setSearchModeFn={setSearchMode}
-                searchOnlineFn={fetchOnline}
+                fetchVideos={fetchVideos}
                 searchKey={searchKey}
             />
 
@@ -86,11 +89,7 @@ export default function VideoSearch({ className }: VideoSearchProps) {
                                         />
                                     ))}
                                 </div>
-                                : (
-                                    searchMode === "local"
-                                        ? <CenterText text={`"${search}" not found`} />
-                                        : <CenterText text={`Pressing "Enter" to start searching`} />
-                                )
+                                : <CenterText text={`Pressing "Enter" to start searching`} />
                         )
                 )
             }
@@ -111,7 +110,7 @@ type SearchBarProp = {
     setSearchFn: Dispatch<SetStateAction<string>>
     setSearchModeFn: Dispatch<SetStateAction<SearchMode>>
     searchMode: SearchMode
-    searchOnlineFn: () => void
+    fetchVideos: () => void
     searchKey: string
     className?: string
 }
@@ -121,12 +120,10 @@ const SearchBar = ({
     setSearchFn,
     setSearchModeFn, 
     searchMode,
-    searchOnlineFn,
+    fetchVideos,
     searchKey,
     className
 }: SearchBarProp) => {
-    const isLocalSearch = searchMode === "local"
-
     return (
         <div className={`${className ?? ""} w-full pr-5 flex gap-2 items-center`}>
             <button className="w-13 my-2 px-1 bg-foreground text-background hover:bg-(--red-clr) hover:text-white transition-colors"
@@ -136,32 +133,23 @@ const SearchBar = ({
                 {capsWord(searchMode)}
             </button>
             
-            <button className={`${!isLocalSearch && "hover:bg-foreground hover:text-background rounded"} px-2`} 
-                disabled={isLocalSearch}
-                onClick={searchOnlineFn}
+            <button className={`hover:bg-foreground hover:text-background rounded px-2`}
+                onClick={fetchVideos}
             >
                 <SearchIcon className="w-7 h-7" />
             </button>
 
-            {isLocalSearch
-                ? <input type="text" 
-                    title="Local search"
-                    placeholder={`${searchKey !== "" ? searchKey : "Local search"}`}
-                    value={search}
-                    onChange={e => setSearchFn(e.target.value)}
-                    className="flex-1 mr-5 px-2 border-b"
-                />
-                : <input type="text" 
-                    placeholder={`${searchKey !== "" ? searchKey : "Online search"}`}
-                    value={search}
-                    onChange={e => setSearchFn(e.target.value)}
-                    onKeyUp={e => {
-                        if (e.key !== "Enter") return
-                        searchOnlineFn()
-                    }}
-                    className="flex-1 mr-5 px-2 border-b"
-                />
-            }
+            <input type="text" 
+                title="Local search"
+                placeholder={searchKey !== "" ? searchKey : `${capsWord(searchMode)} search`}
+                value={search}
+                onChange={e => setSearchFn(e.target.value)}
+                onKeyUp={e => {
+                    if (e.key !== "Enter") return
+                    fetchVideos()
+                }}
+                className="flex-1 mr-5 px-2 border-b"
+            />
         </div>
     )
 }
