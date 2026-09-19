@@ -25,7 +25,9 @@
     
     --z-base: 0;
     --z-options: 100;
-    --z-navbar: 300;
+    --z-sticky: 200;
+    --z-pop-sidebar: 300;
+    --z-navbar: 400;
   }
 }
 
