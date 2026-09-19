@@ -26,7 +26,12 @@ export default function SongQueue({ closeFn, className }: SongQueueParams) {
 
     return (
         // Popup Window of Song Queue on Navbar
-        <div className={`${className ?? ""} max-w-150 w-[60%] h-[calc(100vh-4.5rem)] fixed right-0 top-18 rounded-l-xl bg-(--gray-clr) overflow-auto`}>
+        <div className={`${className ?? ""} 
+                max-w-100 sm:max-w-150 w-full sm:w-[60%] 
+                h-[calc(100vh-4.2rem)] sm:h-[calc(100vh-5.2rem)] md:h-[calc(100vh-4.2rem)] 
+                fixed top-17 sm:top-21 md:top-17 right-0 
+                rounded-l-xl bg-(--gray-clr) overflow-auto
+        `}>
             {songQueue.length >= 1
                 ? <div className="relative">
                     <div className="gap-3 sticky top-0 right-0 z-(--z-pop-sidebar) bg-(--gray-clr) flex justify-end">
@@ -55,6 +60,7 @@ export default function SongQueue({ closeFn, className }: SongQueueParams) {
                                     thumbnail_height={vid.thumbnail_height}
                                     duration_sec={vid.duration_sec as number}
                                     disableQueBtn={true}
+                                    className="[&_a]:grid-cols-1! sm:[&_a]:grid-cols-2!"
                                 />
                             </div>
                             
