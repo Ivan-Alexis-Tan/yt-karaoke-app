@@ -6,10 +6,13 @@ import { useState } from "react";
 
 import { formatMinutesSeconds } from "../utils/helpers"
 import { bannedChannels } from "../appData"
-import useSongQueue, { addSongQueueSelector } from "../utils/useSongQueue";
+import useSongQueue, { addSongQueueSelector, songQueueSelector } from "../utils/useSongQueue";
+
+import { QueueNotifType } from "../types/states";
 
 import AddToListIcon from "../svgs/AddToListIcon";
 import SongAddedIcon from "../svgs/SongAddedIcon";
+import QueueAlertIcon from "../svgs/QueueAlertIcon";
 
 export type KaraokeVideoCardType = {
     video_id: string
@@ -38,25 +41,32 @@ export default function KaraokeVideoCard({
     disableQueBtn = false,
     className,
 }: KaraokeVideoCardType) {
-    const [songAdded, setSongAdded] = useState(false)
+    const [queueNotif, setQueueNotif] = useState<QueueNotifType>("none")
+
+    const songQueue = useSongQueue(songQueueSelector)
     const addSongQueue = useSongQueue(addSongQueueSelector)
 
     function addToQueue() {
-        addSongQueue({
-            video_id,
-            video_title,
-            channel_id,
-            channel_title,
-            thumbnail_url,
-            thumbnail_height,
-            thumbnail_width,
-            duration_sec,
-        })
+        const exists = songQueue.find(vid => vid.video_id === video_id)
+        if (!exists) {
+            addSongQueue({
+                video_id,
+                video_title,
+                channel_id,
+                channel_title,
+                thumbnail_url,
+                thumbnail_height,
+                thumbnail_width,
+                duration_sec,
+            })
 
-        setSongAdded(true)
+            setQueueNotif("added")
+        }
+        else setQueueNotif("error")
+        
 
         setTimeout(() => {
-            setSongAdded(false)
+            setQueueNotif("none")
         }, 3000)
     }
 
@@ -91,11 +101,19 @@ export default function KaraokeVideoCard({
             {/* Options button */}
             {!disableQueBtn
                 && <div className="card-button w-10 h-10 hidden absolute bottom-2 right-2 justify-center items-center hover:bg-(--lucent-blk-clr) rounded-full">
-                    {songAdded
-                        ? <SongAddedIcon className="w-7 h-7 text-green-400 font-bold" />
-                        :<button onClick={_ => addToQueue()}>
+                    {queueNotif === "none"
+                        ? <button onClick={_ => addToQueue()}>
                             <AddToListIcon className="w-7 h-7" />
                         </button>
+                        :<>
+                            {queueNotif === "added"
+                                && <SongAddedIcon className="w-7 h-7 text-green-400 font-bold" />
+                            }
+                            
+                            {queueNotif === "error"
+                                && <QueueAlertIcon className="w-7 h-7 text-(--red-clr) font-bold" />
+                            }
+                        </>
                     }
                 </div>
             }
