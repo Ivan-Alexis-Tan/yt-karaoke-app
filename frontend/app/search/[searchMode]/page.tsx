@@ -1,8 +1,10 @@
 import { searchVideosLocal, searchVideosOnline } from "@/src/api/videosApi";
 import { bannedChannels } from "@/src/appData";
+import { SearchMode } from "@/src/types/states";
 import { capsWord, formatMinutesSeconds } from "@/src/utils/helpers";
 import Image from "next/image";
 import Link from "next/link";
+import SaveSearchResult from "./SaveSearchResult";
 
 type SearchPageProps = {
     searchParams: Promise<{query: string}>
@@ -24,6 +26,12 @@ export default async function SearchPage({ searchParams, params }: SearchPagePro
     return (
         <div className="mx-5 flex flex-col justify-center">
             <p className="my-5 text-xl">{capsWord(searchMode)} search results:</p>
+            
+            <SaveSearchResult 
+                searchkey={query}
+                searchResultList={searchResults}
+            />
+
             {searchResults.map(vid => (
                 <Link key={vid.video_id}
                     href={`/play/${vid.video_id}`}
