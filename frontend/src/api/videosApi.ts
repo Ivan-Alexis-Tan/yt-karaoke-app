@@ -1,7 +1,7 @@
 "use server";
 
 import { bannedChannels } from "../appData";
-import { BASE_URL } from "../utils/helpers";
+import { BASE_URL } from "../core/core";
 
 export async function getRandomVideos(videos_per_page: number = 15, limit: number = 30) {
     const params = new URLSearchParams
