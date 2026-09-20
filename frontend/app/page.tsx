@@ -1,5 +1,3 @@
-
-import { BASE_URL } from "@/src/utils/helpers"
 import ShowVideos from "./ShowVideos";
 import { getRandomVideos } from "@/src/api/videosApi";
 
