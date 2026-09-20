@@ -2,7 +2,6 @@ from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 from datetime import datetime, timedelta
 
-from app.cache.cache_data import cache, ytSearchResult, ytVideo
 from app.db import SessionLocal, db_dependency
 from app.models import models
 from app.utils import yt_fetchers
