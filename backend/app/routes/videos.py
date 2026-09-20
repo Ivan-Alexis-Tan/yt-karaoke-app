@@ -12,6 +12,7 @@ from app.schema import requests as request_schema
 from app.schema import responses as response_schema
 from app.utils import yt_fetchers
 from app.utils.helpers import parse_yt_video_list
+from app.cache import cache
 from app.schema.helpers import mapVideoListResponse
 
 videos_router = APIRouter(prefix="/api/videos", tags=["videos"])
