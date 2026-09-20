@@ -5,7 +5,7 @@ from datetime import datetime
 from typing import List
 
 from app.core import config
-from app.cache.helpers import async_cache_yt_search, parse_yt_search, ytSearchResult
+from app.utils.helpers import async_cache_yt_search, parse_yt_search
 from app.db import db_dependency
 from app.models import models
 from app.schema import responses as response_schema
