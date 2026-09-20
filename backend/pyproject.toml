@@ -8,6 +8,6 @@ dependencies = [
     "alembic>=1.19.2",
     "fastapi[standard]>=0.141.1",
     "httpx>=0.28.1",
-    "psycopg2>=2.9.12",
+    "psycopg2-binary>=2.9.13",
     "sqlalchemy>=2.0.52",
 ]
