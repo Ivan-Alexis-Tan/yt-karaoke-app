@@ -1,4 +1,4 @@
-import ShowVideos from "./ShowVideos";
+import ShowVideos from "../src/components/PaginatedVideoCards";
 import { getRandomVideos } from "@/src/api/videosApi";
 
 export default async function Home() {

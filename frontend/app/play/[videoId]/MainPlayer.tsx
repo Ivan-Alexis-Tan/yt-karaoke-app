@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import useSongQueue, { songQueueSelector, deleteSongQueueSelector } from "@/src/utils/useSongQueue";
 
 import KaraokePlayer from "./KaraokePlayer";
-import ShowVideos from "@/app/ShowVideos";
+import ShowVideos from "@/src/components/PaginatedVideoCards";
 import SongNoteIcon from "@/src/svgs/SongNoteIcon";
 import SearchIcon from "@/src/svgs/SearchIcon";
 import HideIcon from "@/src/svgs/HideIcon";

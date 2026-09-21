@@ -9,7 +9,7 @@ type ShowVideosProps = {
     className?: string
 }
 
-export default function ShowVideos({ videoList, arrange_videos = "row", className }: ShowVideosProps) {
+export default function PaginatedVideoCards({ videoList, arrange_videos = "row", className }: ShowVideosProps) {
     const [openPages, setOpenPages] = useState(1)
 
     function addPage() {
@@ -32,7 +32,7 @@ export default function ShowVideos({ videoList, arrange_videos = "row", classNam
                         thumbnail_height={vid.thumbnail_height}
                         duration_sec={vid.duration_sec as number}
                         arrange={arrange_videos}
-                        className="mx-auto max-w-200 lg:max-w-"
+                        className="mx-auto max-w-200 lg:max-w- [&_a]:grid-cols-1!"
                     />
                 )))}
             </div>
