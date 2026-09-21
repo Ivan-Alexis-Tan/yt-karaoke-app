@@ -3,13 +3,13 @@
 import KaraokeVideoCard from "@/src/components/KaraokeVideoCard"
 import { useState } from "react"
 
-type ShowVideosProps = {
+type PaginatedVideoCardsProps = {
     videoList: VideoListResponse[]
     arrange_videos?: "row" | "col"
     className?: string
 }
 
-export default function PaginatedVideoCards({ videoList, arrange_videos = "row", className }: ShowVideosProps) {
+export default function PaginatedVideoCards({ videoList, arrange_videos = "row", className }: PaginatedVideoCardsProps) {
     const [openPages, setOpenPages] = useState(1)
 
     function addPage() {
@@ -20,7 +20,7 @@ export default function PaginatedVideoCards({ videoList, arrange_videos = "row",
     
     return (
         <>
-            <div className={`${className ?? ""} player-video-karaoke`}>
+            <div className={`${className ?? ""}`}>
                 {paginated.map(page => page.map(vid => (
                     <KaraokeVideoCard key={vid.video_id}
                         video_id={vid.video_id}
@@ -32,7 +32,7 @@ export default function PaginatedVideoCards({ videoList, arrange_videos = "row",
                         thumbnail_height={vid.thumbnail_height}
                         duration_sec={vid.duration_sec as number}
                         arrange={arrange_videos}
-                        className="mx-auto max-w-200 lg:max-w- [&_a]:grid-cols-1!"
+                        className="mx-auto max-w-200 lg:max-w-"
                     />
                 )))}
             </div>
