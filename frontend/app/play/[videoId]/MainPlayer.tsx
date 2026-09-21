@@ -3,15 +3,15 @@
 import { useEffect, useState } from "react";
 
 import useSongQueue, { songQueueSelector, deleteSongQueueSelector } from "@/src/utils/useSongQueue";
+import useCurrentVideo, { addCurrentSongSelector } from "@/src/utils/useCurrentVideo";
 
 import KaraokePlayer from "./KaraokePlayer";
-import ShowVideos from "@/src/components/PaginatedVideoCards";
 import SongNoteIcon from "@/src/svgs/SongNoteIcon";
 import SearchIcon from "@/src/svgs/SearchIcon";
 import HideIcon from "@/src/svgs/HideIcon";
 import NextSongControl from "./NextSongControl";
 import VideoSearch from "./VideoSearch";
-import useCurrentVideo, { addCurrentSongSelector } from "@/src/utils/useCurrentVideo";
+import PaginatedVideoCards from "@/src/components/PaginatedVideoCards";
 
 type MainPlayerProps = {
     videoId: string
@@ -81,8 +81,8 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
             <>
                 {showPane === "songs"
                     && <div className="mx-5 lg:mx-0 lg:overflow-auto">
-                        <ShowVideos className="[&_a.karaoke-video-card]:mx-5 lg:[&_div.karaoke-video-card]:mx-0 lg:[&_div.karaoke-video-card]:mr-5"
-                            videoList={videoList} 
+                        <PaginatedVideoCards videoList={videoList}
+                          className="player-video-karaoke [&_a.karaoke-video-card]:mx-5 lg:[&_div.karaoke-video-card]:mx-0 lg:[&_div.karaoke-video-card]:mr-5"   
                         />
                     </div>
                 }
