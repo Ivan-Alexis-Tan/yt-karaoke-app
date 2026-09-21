@@ -67,7 +67,7 @@ main input:focus-visible {
 }
 
 .player-video-karaoke {
-  .karaoke-video-card a {
+  .karaoke-video-card a, .karaoke-video-card {
     grid-template-columns: repeat(1, minmax(0, 1fr));
 
     @media(width >= 490px) {
