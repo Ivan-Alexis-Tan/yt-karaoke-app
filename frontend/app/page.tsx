@@ -7,7 +7,11 @@ export default async function Home() {
   return (
     <div className="pb-5 bg-zinc-50 font-sans dark:bg-black">
       <ShowVideos 
-        className="px-10 w-full gap-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 items-start justify-between bg-white dark:bg-black"
+        className="
+          px-10 w-full gap-3 grid 
+          grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 [&_a]:grid-cols-1!
+          items-start justify-between bg-white dark:bg-black
+        "
         videoList={randomVideos} 
         arrange_videos="col"  
       />
