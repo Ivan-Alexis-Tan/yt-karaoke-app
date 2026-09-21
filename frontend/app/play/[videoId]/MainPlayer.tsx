@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 import useSongQueue, { songQueueSelector, deleteSongQueueSelector } from "@/src/utils/useSongQueue";
 import useCurrentVideo, { addCurrentSongSelector } from "@/src/utils/useCurrentVideo";
@@ -12,6 +12,7 @@ import HideIcon from "@/src/svgs/HideIcon";
 import NextSongControl from "./NextSongControl";
 import VideoSearch from "./VideoSearch";
 import PaginatedVideoCards from "@/src/components/PaginatedVideoCards";
+import VideoCardSkeleton from "@/src/components/skeletons/VideoCardSkeleton";
 
 type MainPlayerProps = {
     videoId: string
@@ -81,9 +82,15 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
             <>
                 {showPane === "songs"
                     && <div className="mx-5 lg:mx-0 lg:overflow-auto">
-                        <PaginatedVideoCards videoList={videoList}
-                          className="player-video-karaoke [&_a.karaoke-video-card]:mx-5 lg:[&_div.karaoke-video-card]:mx-0 lg:[&_div.karaoke-video-card]:mr-5"   
-                        />
+                        <Suspense fallback={Array.from({ length: 10 }, i => (
+                            <VideoCardSkeleton key={i as number} 
+                                className="player-video-karaoke mx-auto max-w-200 lg:max-w-" 
+                            />
+                        ))}>
+                            <PaginatedVideoCards videoList={videoList}
+                                className="player-video-karaoke [&_a.karaoke-video-card]:mx-5 lg:[&_div.karaoke-video-card]:mx-0 lg:[&_div.karaoke-video-card]:mr-5"   
+                            />
+                        </Suspense>
                     </div>
                 }
 

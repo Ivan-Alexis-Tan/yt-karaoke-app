@@ -1,20 +1,35 @@
+import { Suspense } from "react";
 import ShowVideos from "../src/components/PaginatedVideoCards";
 import { getRandomVideos } from "@/src/api/videosApi";
+import VideoCardSkeleton from "@/src/components/skeletons/VideoCardSkeleton";
 
 export default async function Home() {
   const randomVideos = await getRandomVideos(15, 60)
 
   return (
     <div className="pb-5 bg-zinc-50 font-sans dark:bg-black">
-      <ShowVideos 
-        className="
-          px-10 w-full gap-3 grid 
-          grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 [&_a]:grid-cols-1!
-          items-start justify-between bg-white dark:bg-black
-        "
-        videoList={randomVideos} 
-        arrange_videos="col"  
-      />
+      <Suspense fallback={<div className="
+            px-10 w-full gap-3 grid 
+            grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 [&_a]:grid-cols-1!
+            items-start justify-between bg-white dark:bg-black
+          "
+        >
+          {Array.from({ length: 10 }, (_, k) => (
+            <VideoCardSkeleton key={k} 
+              
+            />))
+          }
+      </div>}>
+        <ShowVideos 
+          className="
+            px-10 w-full gap-3 grid 
+            grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 [&_a]:grid-cols-1!
+            items-start justify-between bg-white dark:bg-black
+          "
+          videoList={randomVideos} 
+          arrange_videos="col"  
+        />
+      </Suspense>
     </div>
   );
 }
