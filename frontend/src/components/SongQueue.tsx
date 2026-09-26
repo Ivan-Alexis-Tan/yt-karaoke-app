@@ -51,14 +51,7 @@ export default function SongQueue({ closeFn, className }: SongQueueParams) {
                         >
                             <div onClick={_ => deleteSongQueue(vid.video_id)}>
                                 <KaraokeVideoCard 
-                                    video_id={vid.video_id}
-                                    video_title={vid.video_title}
-                                    channel_id={vid.channel_id}
-                                    channel_title={vid.channel_title}
-                                    thumbnail_url={vid.thumbnail_url}
-                                    thumbnail_width={vid.thumbnail_width}
-                                    thumbnail_height={vid.thumbnail_height}
-                                    duration_sec={vid.duration_sec as number}
+                                    video_details={vid}
                                     disableQueBtn={true}
                                     className="[&_a]:grid-cols-1! sm:[&_a]:grid-cols-2!"
                                 />
