@@ -28,8 +28,8 @@ export default async function Home() {
   );
 }
 
-const RandomVidsResult = async () => {
-  const randomVideos = await getRandomVideos(15, 60)
+const RandomVidsResult = () => {
+  const randomVideos = getRandomVideos(15, 60)
   
   return (
     <ShowVideos 
