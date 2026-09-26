@@ -7,8 +7,8 @@ type PlayerPageProps = {
 
 export default async function PlayerPage({ params }: PlayerPageProps) {
     const videoId = (await params).videoId;
-    const randomVideos = await getRandomVideos()
-    await cacheToHistory(videoId)
+    const randomVideos = getRandomVideos()
+    // await cacheToHistory(videoId)
 
     return (
         <div className="lg:h-[calc(100vh-75px)]">

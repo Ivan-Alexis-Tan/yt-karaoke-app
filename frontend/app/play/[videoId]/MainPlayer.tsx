@@ -16,7 +16,7 @@ import VideoCardSkeleton from "@/src/components/skeletons/VideoCardSkeleton";
 
 type MainPlayerProps = {
     videoId: string
-    videoList: VideoListResponse[]
+    videoList: Promise<VideoListResponse[]>
     className?: string 
 }
 
@@ -82,7 +82,7 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
             <>
                 {showPane === "songs"
                     && <div className="mx-5 lg:mx-0 lg:overflow-auto">
-                        <Suspense fallback={Array.from({ length: 10 }, i => (
+                        <Suspense fallback={Array.from({ length: 10 }, (_, i) => (
                             <VideoCardSkeleton key={i as number} 
                                 className="player-video-karaoke mx-auto max-w-200 lg:max-w-" 
                             />
