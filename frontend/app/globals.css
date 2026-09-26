@@ -52,6 +52,19 @@ main input:focus-visible {
   border: none;
 }
 
+/* Adaptive Screen-level Viewport Height */
+.adapt-vh-scrn {
+  height: calc(100vh - 4.3rem);
+
+  @media (width >= 40rem) {
+    height: calc(100vh - 5.5rem);
+  }
+
+  @media (width >= 48rem) {
+    height: calc(100vh - 4.3rem);
+  }
+}
+
 /* Player Next Song Button */
 .next-song-container:hover {
   .next-song-btn {
