@@ -15,28 +15,14 @@ import SongAddedIcon from "../svgs/SongAddedIcon";
 import QueueAlertIcon from "../svgs/QueueAlertIcon";
 
 export type KaraokeVideoCardType = {
-    video_id: string
-    video_title: string
-    channel_id: string
-    channel_title: string
-    thumbnail_url: string
-    thumbnail_width: number
-    thumbnail_height: number
-    duration_sec: number
+    video_details: VideoListResponse[number]
     arrange?: "row" | "col"
     disableQueBtn?: boolean
     className?: string
 }
 
 export default function KaraokeVideoCard({
-    video_id,
-    video_title,
-    channel_id,
-    channel_title,
-    thumbnail_url,
-    thumbnail_height,
-    thumbnail_width,
-    duration_sec,
+    video_details,
     arrange = "row",
     disableQueBtn = false,
     className,
@@ -76,25 +62,25 @@ export default function KaraokeVideoCard({
             {/* Video card information */}
             <Link className={`
                     gap-3 p-2 grid items-center
-                    ${bannedChannels.includes(channel_title) && "hidden"} 
+                    ${bannedChannels.includes(video_details.channel_title) && "hidden"} 
                     ${arrange === "row" ? "grid-cols-2" : "grid-cols-1"}
                 `}
-                href={`/play/${video_id}`}
+                href={`/play/${video_details.video_id}`}
             >
                 <div className="relative">
                     <Image className="w-full rounded-2xl" 
-                        src={thumbnail_url} alt="video thumbnail" 
+                        src={video_details.thumbnail_url} alt="video thumbnail" 
                         width={640} height={480} 
                     />
 
                     <div className="px-0.5 absolute bottom-3 right-3 bg-(--lucent-blk-clr)">
-                        {duration_sec ? formatMinutesSeconds(duration_sec) : ""}
+                        {duration}
                     </div>
                 </div>
 
                 <div className="m-1.5 gap-1 flex flex-col justify-center text-white *:text-ellipsis *:overflow-hidden">
-                    <h3 className="text-xl font-bold">{video_title}</h3>
-                    <p>{channel_title}</p>
+                    <h3 className="text-xl font-bold">{video_details.video_title}</h3>
+                    <p>{video_details.channel_title}</p>
                 </div>
             </Link>
 
