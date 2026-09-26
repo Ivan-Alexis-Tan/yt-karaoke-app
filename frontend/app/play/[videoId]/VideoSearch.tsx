@@ -79,14 +79,7 @@ export default function VideoSearch({ className }: VideoSearchProps) {
 
                                     {videoList.map(vid => (
                                         <KaraokeVideoCard key={vid.video_id}
-                                            video_id={vid.video_id}
-                                            video_title={vid.video_title}
-                                            channel_id={vid.channel_id}
-                                            channel_title={vid.channel_title}
-                                            thumbnail_url={vid.thumbnail_url}
-                                            thumbnail_height={vid.thumbnail_height}
-                                            thumbnail_width={vid.thumbnail_width}
-                                            duration_sec={vid.duration_sec as number}
+                                            video_details={vid}
                                             className="mx-auto max-w-200 lg:max-w-"
                                         />
                                     ))}
