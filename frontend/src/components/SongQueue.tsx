@@ -47,7 +47,7 @@ export default function SongQueue({ closeFn, className }: SongQueueParams) {
 
                     {songQueue.map(vid => (
                         <div key={vid.video_id} 
-                            className="mx-3 relative hover:bg-(--light-gray-clr) hover:[&>button]:flex rounded-2xl"
+                            className="mx-3 relative hover:bg-(--light-gray-clr) lg:hover:[&>button]:flex rounded-2xl"
                         >
                             <div onClick={_ => deleteSongQueue(vid.video_id)}>
                                 <KaraokeVideoCard 
@@ -57,10 +57,11 @@ export default function SongQueue({ closeFn, className }: SongQueueParams) {
                                 />
                             </div>
                             
-                            <button className="hidden w-10 h-10 absolute bottom-2 right-2 justify-center items-center hover:bg-background rounded-full"
+                            <button className="flex lg:hidden w-10 h-10 absolute bottom-2 right-2 justify-center items-center hover:bg-background rounded-full"
                                 onClick={_ => {
                                     deleteSongQueue(vid.video_id)
                                 }}
+                                title="Remove song from queue"
                             >
                                 <DeleteIcon className="w-7 h-7" />
                             </button>
