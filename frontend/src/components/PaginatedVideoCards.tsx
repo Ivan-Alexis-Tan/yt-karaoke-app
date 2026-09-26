@@ -1,22 +1,23 @@
 "use client"
 
 import KaraokeVideoCard from "@/src/components/KaraokeVideoCard"
-import { useState } from "react"
+import { use, useState } from "react"
 
 type PaginatedVideoCardsProps = {
-    videoList: VideoListResponse[]
+    videoList: Promise<VideoListResponse[]>
     arrange_videos?: "row" | "col"
     className?: string
 }
 
 export default function PaginatedVideoCards({ videoList, arrange_videos = "row", className }: PaginatedVideoCardsProps) {
     const [openPages, setOpenPages] = useState(1)
+    const randVidList = use(videoList)
 
     function addPage() {
-        if (openPages < videoList.length) setOpenPages(p => p + 1);
+        if (openPages < randVidList.length) setOpenPages(p => p + 1);
     }
 
-    const paginated = videoList.slice(0, openPages)
+    const paginated = randVidList.slice(0, openPages)
     
     return (
         <>
@@ -31,7 +32,7 @@ export default function PaginatedVideoCards({ videoList, arrange_videos = "row",
             </div>
 
             <div className="mx-auto py-2 flex justify-center">
-                {openPages < videoList.length
+                {openPages < randVidList.length
                     && <button className="w-60 hover:bg-foreground hover:text-background border rounded-2xl"
                         onClick={addPage}
                     >
