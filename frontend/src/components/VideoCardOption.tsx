@@ -23,7 +23,6 @@ export default function VideoCardOption({ video_details, className }: VideoCardO
             setQueueNotif("added")
         }
         else setQueueNotif("error")
-        
 
         setTimeout(() => {
             setQueueNotif("none")
@@ -31,7 +30,7 @@ export default function VideoCardOption({ video_details, className }: VideoCardO
     }
     
     return (
-        <div className={`${className ?? ""} card-button w-10 h-10 hidden absolute bottom-2 right-2 justify-center items-center hover:bg-(--lucent-blk-clr) rounded-full`}>
+        <div className={`${className ?? ""} card-button w-10 h-10 flex lg:hidden absolute bottom-2 right-2 justify-center items-center lg:hover:bg-(--lucent-blk-clr) rounded-full`}>
             {queueNotif === "none"
                 ? <button onClick={_ => addToQueue()}>
                     <AddToListIcon className="w-7 h-7" />
