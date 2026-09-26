@@ -1,10 +1,18 @@
-import { searchVideosLocal, searchVideosOnline } from "@/src/api/videosApi";
-import { bannedChannels } from "@/src/appData";
-import { SearchMode } from "@/src/types/states";
-import { capsWord, formatMinutesSeconds } from "@/src/utils/helpers";
 import Image from "next/image";
 import Link from "next/link";
+import { Suspense } from "react";
+
+// Utils
+import { searchVideosLocal, searchVideosOnline } from "@/src/api/videosApi";
+import { bannedChannels } from "@/src/appData";
+import { capsWord, formatMinutesSeconds } from "@/src/utils/helpers";
+
+// Types
+import { SearchMode } from "@/src/types/states";
+
+// Components
 import SaveSearchResult from "./SaveSearchResult";
+import LoadingSearchPage from "./LoadingSearchPage";
 
 type SearchPageProps = {
     searchParams: Promise<{query: string}>
@@ -15,6 +23,16 @@ export default async function SearchPage({ searchParams, params }: SearchPagePro
     const { searchMode } = await params;
     const { query } = await searchParams;
 
+    return (
+        <Suspense key={searchMode + query} 
+            fallback={<LoadingSearchPage className="adapt-vh-scrn w-full flex flex-col justify-center items-center" />}
+        >
+            <Test searchMode={searchMode} query={query} />
+        </Suspense>
+    )
+}
+
+const Test = async ({ searchMode, query }: { searchMode: SearchMode, query: string }) => {
     async function generateSearch(): Promise<VideoListResponse> {
         if (searchMode === "local") return await searchVideosLocal(query);
 
@@ -22,16 +40,18 @@ export default async function SearchPage({ searchParams, params }: SearchPagePro
     }
 
     const searchResults = await generateSearch()
-
+    
     return (
         <div className="mx-5 flex flex-col justify-center">
             <p className="my-5 text-xl">{capsWord(searchMode)} search results:</p>
             
+            {/* Caches search result */}
             <SaveSearchResult 
                 searchkey={query}
                 searchResultList={searchResults}
             />
 
+            {/* Video Cards */}
             {searchResults.map(vid => (
                 <Link key={vid.video_id}
                     href={`/play/${vid.video_id}`}
