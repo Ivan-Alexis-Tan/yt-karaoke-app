@@ -2,17 +2,10 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { useState } from "react";
 
 import { formatMinutesSeconds } from "../utils/helpers"
 import { bannedChannels } from "../appData"
-import useSongQueue, { addSongQueueSelector, songQueueSelector } from "../utils/useSongQueue";
-
-import { QueueNotifType } from "../types/states";
-
-import AddToListIcon from "../svgs/AddToListIcon";
-import SongAddedIcon from "../svgs/SongAddedIcon";
-import QueueAlertIcon from "../svgs/QueueAlertIcon";
+import VideoCardOption from "./VideoCardOption";
 
 export type KaraokeVideoCardType = {
     video_details: VideoListResponse[number]
@@ -27,34 +20,7 @@ export default function KaraokeVideoCard({
     disableQueBtn = false,
     className,
 }: KaraokeVideoCardType) {
-    const [queueNotif, setQueueNotif] = useState<QueueNotifType>("none")
-
-    const songQueue = useSongQueue(songQueueSelector)
-    const addSongQueue = useSongQueue(addSongQueueSelector)
-
-    function addToQueue() {
-        const exists = songQueue.find(vid => vid.video_id === video_id)
-        if (!exists) {
-            addSongQueue({
-                video_id,
-                video_title,
-                channel_id,
-                channel_title,
-                thumbnail_url,
-                thumbnail_height,
-                thumbnail_width,
-                duration_sec,
-            })
-
-            setQueueNotif("added")
-        }
-        else setQueueNotif("error")
-        
-
-        setTimeout(() => {
-            setQueueNotif("none")
-        }, 3000)
-    }
+    const duration = video_details.duration_sec ? formatMinutesSeconds(video_details.duration_sec) : ""
 
     return (
         <div className={`${className ?? ""} karaoke-video-card relative hover:bg-(--gry-700) hover:[&_div.card-button]:flex rounded-2xl transition-all`}>
@@ -85,24 +51,7 @@ export default function KaraokeVideoCard({
             </Link>
 
             {/* Options button */}
-            {!disableQueBtn
-                && <div className="card-button w-10 h-10 hidden absolute bottom-2 right-2 justify-center items-center hover:bg-(--lucent-blk-clr) rounded-full">
-                    {queueNotif === "none"
-                        ? <button onClick={_ => addToQueue()}>
-                            <AddToListIcon className="w-7 h-7" />
-                        </button>
-                        :<>
-                            {queueNotif === "added"
-                                && <SongAddedIcon className="w-7 h-7 text-green-400 font-bold" />
-                            }
-                            
-                            {queueNotif === "error"
-                                && <QueueAlertIcon className="w-7 h-7 text-(--red-clr) font-bold" />
-                            }
-                        </>
-                    }
-                </div>
-            }
+            {!disableQueBtn && <VideoCardOption video_details={video_details} />}
 
         </div>
     )
