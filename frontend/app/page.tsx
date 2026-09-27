@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { getRandomVideos } from "@/src/api/videosApi";
 
 import VideoCardSkeleton from "@/src/components/skeletons/VideoCardSkeleton";
-import ShowVideos from "../src/components/PaginatedVideoCards";
+import PaginatedVideoCards from "../src/components/PaginatedVideoCards";
 
 export default async function Home() {
 
@@ -32,11 +32,11 @@ const RandomVidsResult = () => {
   const randomVideos = getRandomVideos(15, 60)
   
   return (
-    <ShowVideos 
+    <PaginatedVideoCards 
       className="
         px-10 w-full gap-3 grid 
         grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 [&_a]:grid-cols-1!
-        items-start justify-between bg-white dark:bg-black
+        items-start justify-between bg-white dark:bg-black [&_div.karaoke-video-card]:w-full
       "
       videoList={randomVideos} 
       arrange_videos="col"  
