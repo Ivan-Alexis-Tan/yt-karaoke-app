@@ -1,11 +1,8 @@
-import Image from "next/image";
-import Link from "next/link";
 import { Suspense } from "react";
 
 // Utils
 import { searchVideosLocal, searchVideosOnline } from "@/src/api/videosApi";
-import { bannedChannels } from "@/src/appData";
-import { capsWord, formatMinutesSeconds } from "@/src/utils/helpers";
+import { capsWord } from "@/src/utils/helpers";
 
 // Types
 import { SearchMode } from "@/src/types/states";
@@ -13,6 +10,7 @@ import { SearchMode } from "@/src/types/states";
 // Components
 import SaveSearchResult from "./SaveSearchResult";
 import LoadingSearchPage from "./LoadingSearchPage";
+import KaraokeVideoCard from "@/src/components/KaraokeVideoCard";
 
 type SearchPageProps = {
     searchParams: Promise<{query: string}>
@@ -25,14 +23,16 @@ export default async function SearchPage({ searchParams, params }: SearchPagePro
 
     return (
         <Suspense key={searchMode + query} 
-            fallback={<LoadingSearchPage className="adapt-vh-scrn w-full flex flex-col justify-center items-center" />}
+            fallback={<LoadingSearchPage 
+                className="adapt-vh-scrn mx-5 flex flex-col justify-center items-center" 
+            />}
         >
-            <Test searchMode={searchMode} query={query} />
+            <SearchResults searchMode={searchMode} query={query} />
         </Suspense>
     )
 }
 
-const Test = async ({ searchMode, query }: { searchMode: SearchMode, query: string }) => {
+const SearchResults = async ({ searchMode, query }: { searchMode: SearchMode, query: string }) => {
     async function generateSearch(): Promise<VideoListResponse> {
         if (searchMode === "local") return await searchVideosLocal(query);
 
@@ -42,7 +42,7 @@ const Test = async ({ searchMode, query }: { searchMode: SearchMode, query: stri
     const searchResults = await generateSearch()
     
     return (
-        <div className="mx-5 flex flex-col justify-center">
+        <div className={`mx-5 mb-5 flex flex-col justify-center`}>
             <p className="my-5 text-xl">{capsWord(searchMode)} search results:</p>
             
             {/* Caches search result */}
@@ -52,29 +52,17 @@ const Test = async ({ searchMode, query }: { searchMode: SearchMode, query: stri
             />
 
             {/* Video Cards */}
-            {searchResults.map(vid => (
-                <Link key={vid.video_id}
-                    href={`/play/${vid.video_id}`}
-                    className={`${bannedChannels.includes(vid.channel_title) && "hidden"} mx-auto max-h-90 max-w-300 w-full p-2 gap-3 grid grid-cols-[minmax(160px,0.7fr)_minmax(100,1.3fr)] items-center rounded-2xl hover:bg-(--gry-700)`}
-                >
-                    <div className="relative">
-                        <Image className="max-h-fit h-full rounded-2xl" 
-                            src={vid.thumbnail_url}
-                            width={vid.thumbnail_width}
-                            height={vid.thumbnail_height}
-                            alt="video-thumbnail"
+            {searchResults.length >= 1
+                ? <div className="mx-auto max-w-250">
+                    {searchResults.map(vid => (
+                        <KaraokeVideoCard key={vid.video_id}
+                            video_details={vid}
+                            className="[&_a]:grid-cols-1 sm:[&_a]:grid-cols-2"
                         />
-                        <div className="px-1 absolute bottom-3 right-3 bg-(--lucent-blk-clr)">
-                            {vid.duration_sec as number && formatMinutesSeconds(vid.duration_sec as number)}
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 className="text-xl font-bold mb-3">{vid.video_title}</h3>
-                        <p>{vid.channel_title}</p>
-                    </div>
-                </Link>
-            ))}
+                    ))}
+                </div>
+                : <p className="text-2xl text-center">No song "{query}" found</p>
+            }
         </div>
     )
 }
