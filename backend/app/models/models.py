@@ -37,6 +37,10 @@ class Video(BaseModel):
     history: Mapped[list["History"]] = relationship(back_populates="video")
     channel: Mapped["Channel"] = relationship(back_populates="videos")
     statistics: Mapped["Statistics"] = relationship(back_populates="video")
+    banned_video: Mapped["BannedVideo | None"] = relationship(
+        back_populates="video",
+        uselist=False,
+    )
 
 
 class Channel(BaseModel):
@@ -46,6 +50,7 @@ class Channel(BaseModel):
     name: Mapped[str] = mapped_column(String(50))
 
     videos: Mapped[list["Video"]] = relationship(back_populates='channel')
+    banned_videos: Mapped[list["BannedVideo"]] = relationship(back_populates='channel')
 
 
 class History(BaseModel):
@@ -110,3 +115,13 @@ class NextVideo(BaseModel):
             name="unq_next_video_pair"
         ),
     )
+
+
+class BannedVideo(BaseModel):
+    __tablename__ = "banned_videos"
+
+    video_id: Mapped[str] = mapped_column(ForeignKey('videos.video_id'), unique=True)
+    channel_id: Mapped[str] = mapped_column(ForeignKey('channels.channel_id'), index=True)
+
+    video: Mapped["Video"] = relationship(back_populates="banned_videos")
+    channel: Mapped["Channel"] = relationship(back_populates="banned_videos")
