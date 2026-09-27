@@ -36,7 +36,7 @@ export default function NextSongControl({ songQueue, deleteSongQueue, className 
             <p className="next-song-title py-0.5 px-2 whitespace-nowrap text-ellipsis overflow-hidden"
                 title={`${nextSong["video_title"]}`}
             >
-                <span className="font-bold text-green-400">NEXT:</span> {nextSong["video_title"]}
+                <span className="text-xl font-bold text-green-400">NEXT:</span> {nextSong["video_title"]}
             </p>
         </Link>
     );
