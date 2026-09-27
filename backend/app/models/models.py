@@ -122,6 +122,7 @@ class BannedVideo(BaseModel):
 
     video_id: Mapped[str] = mapped_column(ForeignKey('videos.video_id'), unique=True)
     channel_id: Mapped[str] = mapped_column(ForeignKey('channels.channel_id'), index=True)
+    date: Mapped[datetime] = mapped_column(default=datetime.utcnow)
 
-    video: Mapped["Video"] = relationship(back_populates="banned_videos")
+    video: Mapped["Video"] = relationship(back_populates="banned_video")
     channel: Mapped["Channel"] = relationship(back_populates="banned_videos")
