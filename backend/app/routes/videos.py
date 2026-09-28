@@ -24,7 +24,8 @@ async def get_random_videos(db: db_dependency, payload: request_schema.GetRandVi
         .options(contains_eager(models.Video.channel))
         .filter(
             ~exists().where(
-                models.BannedVideo.video_id == models.Video.video_id
+                (models.BannedVideo.video_id == models.Video.video_id)
+                | (models.BannedVideo.channel_id == models.Video.channel_id)
             )
         )
         .order_by(func.random())
@@ -58,7 +59,8 @@ async def search_local(query: str, db: db_dependency):
         .where(models.Video.title.ilike(f"%{query}%"))
         .filter(
             ~exists().where(
-                models.BannedVideo.video_id == models.Video.video_id
+                (models.BannedVideo.video_id == models.Video.video_id)
+                | (models.BannedVideo.channel_id == models.Video.channel_id)
             )
         )
     ).scalars().all()
