@@ -1,17 +1,14 @@
 from fastapi import APIRouter, BackgroundTasks
 from sqlalchemy.orm import selectinload
-import httpx
 from datetime import datetime
 from typing import List
 
-from app.type.yt_search_response import YTSearchListResponse
-
-from app.core import config
 from app.utils.helpers import async_cache_yt_search, parse_yt_search
+from app.utils.yt_fetchers import req_yt_search
 from app.db import db_dependency
 from app.models import models
 from app.schema import responses as response_schema
-from app.schema.helpers import mapVideoListResponse
+from app.schema.mappers import mapVideoListResponse
 
 yt_router = APIRouter(prefix="/api/youtube", tags=["youtube"])
 
@@ -25,10 +22,15 @@ async def yt_search(query: str, db: db_dependency, bg_task: BackgroundTasks):
     if exists and exists.expires_at > now:
         print(">>> Pulled data from DB.")
 
-        db_returned = db.query(models.SearchCacheVideo).options(
-            selectinload(models.SearchCacheVideo.video)
-                .joinedload(models.Video.channel)
-        ).filter(models.SearchCacheVideo.search_id == exists.id).all()
+        db_returned = (
+            db.query(models.SearchCacheVideo)
+            .options(
+                selectinload(models.SearchCacheVideo.video)
+                    .joinedload(models.Video.channel)
+            )
+            .filter(models.SearchCacheVideo.search_id == exists.id)
+            .all()
+        )
 
         return [
             mapVideoListResponse(cache)

@@ -1,8 +1,10 @@
+from app.type.parsed_YtApi import ParsedYtVideo, ParsedYtSearch
 from app.models import models
+
 from app.schema.responses import VideoListResponse
 
-def mapVideoListResponse(video: dict | models.Video) -> VideoListResponse:
-    if type(video) != dict:
+def mapVideoListResponse(video: ParsedYtVideo | ParsedYtSearch | models.Video) -> VideoListResponse:
+    if isinstance(video, models.Video):
         return VideoListResponse(
             video_id=video.video_id,
             video_title=video.title,
