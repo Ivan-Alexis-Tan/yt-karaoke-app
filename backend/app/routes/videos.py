@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, BackgroundTasks, HTTPException
 from starlette import status
-from sqlalchemy import func, select
+from sqlalchemy import func, select, exists
 from sqlalchemy.orm import contains_eager, selectinload, joinedload
 import math
 from datetime import datetime, timedelta
@@ -22,6 +22,11 @@ async def get_random_videos(db: db_dependency, payload: request_schema.GetRandVi
         select(models.Video)
         .join(models.Video.channel)
         .options(contains_eager(models.Video.channel))
+        .filter(
+            ~exists().where(
+                models.BannedVideo.video_id == models.Video.video_id
+            )
+        )
         .order_by(func.random())
         .limit(payload.limit)
     )
@@ -33,12 +38,13 @@ async def get_random_videos(db: db_dependency, payload: request_schema.GetRandVi
     ]
 
     # Prepares data for pagination
-    result = []
+    result: list[list[response_schema.VideoListResponse]] = []
     start = 0
     length = len(rand_vids)
     for _ in range(math.ceil(payload.limit / payload.videos_per_page)):
         sum = start + payload.videos_per_page
         end = sum if length >= sum else length
+        
         result.append(rand_vids[start:end])
         start = end
 
@@ -50,6 +56,11 @@ async def search_local(query: str, db: db_dependency):
     query = db.execute(
         select(models.Video)
         .where(models.Video.title.ilike(f"%{query}%"))
+        .filter(
+            ~exists().where(
+                models.BannedVideo.video_id == models.Video.video_id
+            )
+        )
     ).scalars().all()
 
     return [
@@ -83,7 +94,7 @@ async def get_video(video_id: str, db: db_dependency, bg_task: BackgroundTasks):
 
 
 @videos_router.post("/next_video", status_code=status.HTTP_201_CREATED)
-async def to_next_video(init_id: str, next_id: str, db: db_dependency):
+async def to_next_video(init_id: str, next_id: str, db: db_dependency) -> None:
     exists = (
         db.query(models.NextVideo)
         .filter(
@@ -109,13 +120,18 @@ async def to_next_video(init_id: str, next_id: str, db: db_dependency):
 
 
 @videos_router.post("/{video_id}/history", status_code=status.HTTP_204_NO_CONTENT)
-async def cache_to_history(video_id: str, db: db_dependency):
+async def cache_to_history(video_id: str, db: db_dependency) -> None:
     now = datetime.utcnow()
 
-    exists = db.query(models.History).filter(
-        models.History.video_id == video_id,
-        models.History.user_id == None,
-    ).order_by(models.History.played_at.desc()).first()
+    exists = (
+        db.query(models.History)
+        .filter(
+            models.History.video_id == video_id,
+            models.History.user_id == None,
+        )
+        .order_by(models.History.played_at.desc())
+        .first()
+    )
 
     if exists and (exists.played_at + timedelta(minutes=5)) > now:
         raise HTTPException(
