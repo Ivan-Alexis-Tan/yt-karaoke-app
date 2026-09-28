@@ -10,8 +10,7 @@ from app.models import models
 from app.db import db_dependency
 from app.schema import requests as request_schema
 from app.schema import responses as response_schema
-from app.utils import yt_fetchers
-from app.utils.helpers import parse_yt_video_list
+from app.utils import yt_fetchers, parsers
 from app.cache import cache
 from app.schema.mappers import mapVideoListResponse
 
@@ -72,7 +71,7 @@ async def get_video(video_id: str, db: db_dependency, bg_task: BackgroundTasks):
         return mapVideoListResponse(in_db)
 
     fetched = await yt_fetchers.req_yt_video(video_id)
-    parsed = parse_yt_video_list(fetched)
+    parsed = parsers.parse_yt_video_list(fetched)
 
     bg_task.add_task(
         cache.async_cache_videos,

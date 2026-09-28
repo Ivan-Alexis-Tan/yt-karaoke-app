@@ -3,7 +3,7 @@ from sqlalchemy.orm import selectinload
 from datetime import datetime
 from typing import List
 
-from app.utils.helpers import async_cache_yt_search, parse_yt_search
+from app.utils import parsers, cache
 from app.utils.yt_fetchers import req_yt_search
 from app.db import db_dependency
 from app.models import models
@@ -41,11 +41,11 @@ async def yt_search(query: str, db: db_dependency, bg_task: BackgroundTasks):
 
     # YT API Request Func
     search_api = await req_yt_search(lowered_query)
-    parsed = parse_yt_search(search_api)
+    parsed = parsers.parse_yt_search(search_api)
 
     # Background process for adding data to DB
     bg_task.add_task(
-        async_cache_yt_search,
+        cache.async_cache_yt_search,
         query_key=lowered_query,
         etag=search_api["etag"],
         parsed_yt_search_data=parsed,
