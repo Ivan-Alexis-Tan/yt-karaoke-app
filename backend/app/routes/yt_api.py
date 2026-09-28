@@ -38,26 +38,7 @@ async def yt_search(query: str, db: db_dependency, bg_task: BackgroundTasks):
     print(">>> Query not cached yet")
 
     # YT API Request Func
-    async def api_req():
-        params = {
-            "part": "snippet",
-            "q": f"{lowered_query} karaoke",
-            "type": "video",
-            "maxResults": 20,
-            "key": config.API_KEY,
-        }
-
-        async with httpx.AsyncClient() as client:
-            print('>> (api_req): Called the YT `search.list` API')
-            response = await client.get(
-                url=f"{config.YOUTUBE_URL}/search",
-                params=params
-            )
-            response.raise_for_status()
-            return response.json()
-
-
-    search_api: YTSearchListResponse = await api_req()
+    search_api = await req_yt_search(lowered_query)
     parsed = parse_yt_search(search_api)
 
     # Background process for adding data to DB
