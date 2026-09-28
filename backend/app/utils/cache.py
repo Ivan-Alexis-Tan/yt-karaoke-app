@@ -1,11 +1,20 @@
 from datetime import datetime, timedelta
 from sqlalchemy import select
+from typing import TypedDict
 
 from app.type.parsed_YtApi import ParsedYtSearch
 
 from app.db import db_dependency
 from app.models import models
 from app.utils import db_checkers, yt_fetchers, parsers
+
+class ToSearchCacheVideosType(TypedDict):
+    search_id: str
+    video_id: str
+    channel_id: str
+    channel_title: str
+    position: int | None
+
 
 async def async_cache_yt_search(
     query_key: str, 
@@ -36,7 +45,7 @@ async def async_cache_yt_search(
         query_cache = new_search_cache
 
     # Mapping videos and channels return from API response
-    to_search_cache_videos = []
+    to_search_cache_videos: list[ToSearchCacheVideosType] = []
     video_ids = []
     channel_ids: dict[str, str] = {}
 
@@ -57,20 +66,13 @@ async def async_cache_yt_search(
     not_in_video_tbl = db_checkers.not_in_videos_tbl(video_ids, db)
     no_existing_channel = db_checkers.not_in_channels_tbl(channel_ids.keys(), db)
 
-    for video in to_search_cache_videos:
-        if not video["in_videos_tbl"]:
-            not_in_video_tbl.append(video["video_id"])
-
-        if not video["channel_exists"]:
-            no_existing_channel[video["channel_id"]] = video["channel_title"]
-
     # Creating DB row for channels if it does not exists in DB
     if len(no_existing_channel) >= 1:
         list_create_channel = []
-        for channel_id, channel_title in no_existing_channel.items():
+        for channel_id in no_existing_channel:
             list_create_channel.append(models.Channel(
                 channel_id = channel_id,
-                name = channel_title,
+                name = channel_ids[channel_id],
             ))
 
         db.add_all(list_create_channel)
@@ -78,36 +80,15 @@ async def async_cache_yt_search(
 
     # Create row of videos if it does not exists in DB 
     if len(not_in_video_tbl) >= 1:
-        yt_video_list = await yt_fetchers.req_yt_video(not_in_video_tbl)
-        parsed_video_list = parsers.parse_yt_video_list(yt_video_list)
-
-        new_video_rows = []
-        for video in parsed_video_list:
-            statistics_data = video["statistics"]
-            
-            new_video_rows.append(models.Video(
-                video_id = video["video_id"],
-                title = video["video_title"],
-                channel_id = video["channel_id"],
-                thumbnail_url = video["thumbnail_url"],
-                thumbnail_width = video["thumbnail_width"],
-                thumbnail_height = video["thumbnail_height"],
-                duration_sec = video["duration_sec"],
-                statistics = models.Statistics(
-                    view_count = statistics_data["view_count"],
-                    like_count = statistics_data["like_count"],
-                    comment_count = statistics_data["comment_count"]
-                )
-            ))
-
+        new_video_rows = await create_video_rows(not_in_video_tbl)
         db.add_all(new_video_rows)
 
     # Create SearchCacheVideo table row if it does not exists
-    q_search_cache_video = (
+    in_search_cache_video = db.execute(
         select(models.SearchCacheVideo.video_id)
         .filter(models.SearchCacheVideo.search_id == query_cache.id)
-    )
-    in_search_cache_video = db.execute(q_search_cache_video).scalars().all()
+    ).scalars().all()
+
     not_in_search_cache_video = [
         video
         for video in to_search_cache_videos 
@@ -126,4 +107,30 @@ async def async_cache_yt_search(
         db.add_all(new_search_cache_videos)
         print(">>> async_cache_yt_search(): `new_search_cache_videos` saved to DB")
           
-    # db.commit()
+    db.commit()
+
+
+async def create_video_rows(video_ids: list[str]):
+    yt_video_list = await yt_fetchers.req_yt_video(video_ids)
+    parsed_video_list = parsers.parse_yt_video_list(yt_video_list)
+
+    new_video_rows = []
+    for video in parsed_video_list:
+        statistics_data = video["statistics"]
+        
+        new_video_rows.append(models.Video(
+            video_id = video["video_id"],
+            title = video["video_title"],
+            channel_id = video["channel_id"],
+            thumbnail_url = video["thumbnail_url"],
+            thumbnail_width = video["thumbnail_width"],
+            thumbnail_height = video["thumbnail_height"],
+            duration_sec = video["duration_sec"],
+            statistics = models.Statistics(
+                view_count = statistics_data["view_count"],
+                like_count = statistics_data["like_count"],
+                comment_count = statistics_data["comment_count"]
+            )
+        ))
+
+    return new_video_rows
