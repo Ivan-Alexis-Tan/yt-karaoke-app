@@ -4,6 +4,8 @@ import httpx
 from datetime import datetime
 from typing import List
 
+from app.type.yt_search_response import YTSearchListResponse
+
 from app.core import config
 from app.utils.helpers import async_cache_yt_search, parse_yt_search
 from app.db import db_dependency
@@ -55,7 +57,7 @@ async def yt_search(query: str, db: db_dependency, bg_task: BackgroundTasks):
             return response.json()
 
 
-    search_api = await api_req()
+    search_api: YTSearchListResponse = await api_req()
     parsed = parse_yt_search(search_api)
 
     # Background process for adding data to DB

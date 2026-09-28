@@ -1,8 +1,9 @@
 import httpx
 
 from app.core import config
+from app.type.yt_video_response import YTVideoListResponse
 
-async def req_yt_video(id: str | list, params: dict = {}):
+async def req_yt_video(id: str | list[str], params: dict = {}) -> YTVideoListResponse:
     params = {
         "id": id if isinstance(id, str) else ",".join(id),
         "part": "snippet,contentDetails,statistics",

@@ -2,11 +2,15 @@ from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 from datetime import datetime, timedelta
 
+from app.type.parsed_YtApi import ParsedYtSearch, ParsedYtVideo
+from app.type.yt_search_response import YTSearchListResponse
+from app.type.yt_video_response import YTVideoListResponse
+
 from app.db import SessionLocal, db_dependency
 from app.models import models
 from app.utils import yt_fetchers
 
-def duration_to_seconds(duration: str):
+def duration_to_seconds(duration: str) -> int:
     duration = duration.removeprefix("PT")
     time = {
         "hour": 0,
@@ -29,15 +33,17 @@ def duration_to_seconds(duration: str):
     return sum(time.values())
 
 
-def parse_yt_search(data: dict):
+def parse_yt_search(data: YTSearchListResponse) -> list[ParsedYtSearch]:
+    """Parsing yt search response API"""
+    
     parsed = []
-    items: list = data["items"]
+    items = data["items"]
 
     for idx, item in enumerate(items, start=1):
         snippet = item["snippet"]
         thumbnail = snippet["thumbnails"]["medium"]
 
-        data: dict = {
+        data: ParsedYtSearch = {
             "position": idx,
             "video_id": item["id"]["videoId"],
             "video_title": snippet["title"],
@@ -53,7 +59,9 @@ def parse_yt_search(data: dict):
     return parsed
 
 
-def parse_yt_video_list(video_list: dict):
+def parse_yt_video_list(video_list: YTVideoListResponse) -> list[ParsedYtVideo]:
+    """Parsing yt list response API"""
+    
     parsed_list = []
 
     for video in video_list["items"]:
@@ -61,6 +69,7 @@ def parse_yt_video_list(video_list: dict):
 
         thumbnail_keys = snippet["thumbnails"].keys()
 
+        # Thumbnail key guard
         if "standard" in thumbnail_keys:
             thumbnail = snippet["thumbnails"]["standard"]
         elif "high" in thumbnail_keys:
@@ -70,16 +79,17 @@ def parse_yt_video_list(video_list: dict):
 
         duration = video["contentDetails"]["duration"]
         statistics = video["statistics"]
-        
+
         snippet_keys = snippet.keys()
         statistics_keys = statistics.keys()
 
+        # Parsing and Appending YT video list response API
         parsed_list.append({
             "video_id": video["id"],
             "video_title": snippet["title"],
             "thumbnail_url": thumbnail["url"],
-            "thumbnail_width": thumbnail["width"],
-            "thumbnail_height": thumbnail["height"],
+            "thumbnail_width": 640,
+            "thumbnail_height": 480,
             "channel_id": snippet['channelId'],
             "channel_title": snippet["channelTitle"],
             "duration_sec": duration_to_seconds(duration),
@@ -98,7 +108,7 @@ def parse_yt_video_list(video_list: dict):
 async def async_cache_yt_search(
     query_key: str, 
     etag: str, 
-    parsed_yt_search_data: dict, 
+    parsed_yt_search_data: list[ParsedYtSearch], 
     db: db_dependency, 
     ttl_min: int = 60
 ):
@@ -138,15 +148,15 @@ async def async_cache_yt_search(
     ]
 
     # Mapping Non-existing data for videos and channels
-    not_in_video_tbl = [
-        video["video_id"]
-        for video in to_search_cache_videos if video["in_videos_tbl"] == False
-    ]
-    no_existing_channel: dict = {
-        video["channel_id"]: video["channel_title"]
-        for video in to_search_cache_videos 
-        if video["channel_exists"] == False
-    }
+    not_in_video_tbl = []
+    no_existing_channel: dict = {}
+
+    for video in to_search_cache_videos:
+        if not video["in_videos_tbl"]:
+            not_in_video_tbl.append(video["video_id"])
+
+        if not video["channel_exists"]:
+            no_existing_channel[video["channel_id"]] = video["channel_title"]
 
     # Creating DB row for channels if it does not exists in DB
     if len(no_existing_channel) >= 1:
@@ -194,7 +204,8 @@ async def async_cache_yt_search(
     in_search_cache_video = db.execute(q_search_cache_video).scalars().all()
     not_in_search_cache_video = [
         video
-        for video in to_search_cache_videos if video["video_id"] not in in_search_cache_video
+        for video in to_search_cache_videos 
+        if video["video_id"] not in in_search_cache_video
     ]
     
     if len(not_in_search_cache_video) >= 1:
