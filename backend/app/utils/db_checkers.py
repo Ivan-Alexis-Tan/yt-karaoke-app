@@ -30,3 +30,14 @@ def not_in_channels_tbl(channel_ids: list[str], db: db_dependency) -> list[str]:
         channel_id for channel_id in channel_ids
         if channel_id not in in_db
     ]
+
+
+def sift_banned_channels(channels: list[str], db: db_dependency) -> list[str]:
+    """Sifts channel ids and returns ids that are banned (ignores not banned ids)."""
+    banned = (
+        db.query(models.BannedVideo)
+        .filter(models.BannedVideo.channel_id.in_(channels))
+        .all()
+    )
+
+    return [ *{video.channel_id for video in banned} ]
