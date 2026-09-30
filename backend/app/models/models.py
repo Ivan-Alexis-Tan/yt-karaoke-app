@@ -1,8 +1,14 @@
-from sqlalchemy import String, Text, ForeignKey, UniqueConstraint
+from sqlalchemy import String, Text, ForeignKey, UniqueConstraint, Enum
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 import uuid
 from datetime import datetime
 from typing import Optional
+import enum
+
+class UserRole(enum.Enum):
+    USER = "user"
+    ADMIN = "admin"
+
 
 class BaseModel(DeclarativeBase):
     __abstract__ = True
@@ -17,8 +23,15 @@ class BaseModel(DeclarativeBase):
 class User(BaseModel):
     __tablename__ = "users"
 
-    email: Mapped[str] = mapped_column()
+    sub_id: Mapped[str] = mapped_column(unique=True, index=True)
+    email: Mapped[str] = mapped_column(unique=True, index=True)
+    name: Mapped[str | None] = mapped_column()
+    picture: Mapped[str | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    role: Mapped[UserRole] = mapped_column(
+        Enum(UserRole, name="user_role"),
+        default=UserRole.USER.value,
+    )
 
     history: Mapped[list["History"]] = relationship(back_populates="user")
 
