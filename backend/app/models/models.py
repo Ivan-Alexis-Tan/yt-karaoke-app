@@ -24,7 +24,7 @@ class User(BaseModel):
     __tablename__ = "users"
 
     sub_id: Mapped[str] = mapped_column(unique=True, index=True)
-    email: Mapped[str] = mapped_column(unique=True, index=True)
+    email: Mapped[str | None] = mapped_column(index=True)
     name: Mapped[str | None] = mapped_column()
     picture: Mapped[str | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
