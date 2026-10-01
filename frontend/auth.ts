@@ -11,27 +11,34 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     providers: [Google, Github],
     
     callbacks: {
-        async jwt({ token, account }) {
+        async jwt({ token, account, profile }) {
             if (account) {
-                const backendToken = await new SignJWT({
-                    sub: token.sub,
-                    email: token.email,
-                    name: token.name,
-                    picture: token.picture,
-                })
-                .setProtectedHeader({ alg: "HS256" })
-                .setIssuedAt()
-                .setExpirationTime("1h")
-                .sign(BACKEND_AUTH_SECRET);
+                token.provider = account.provider
+                const providerUserId = account.provider === "google"
+                    ? profile?.sub
+                    : profile?.id
 
-                token.backendToken = backendToken;
+                token.uid = providerUserId
             }
 
             return token
         },
 
         async session({ session, token }) {
-            session.backendToken = token.backendToken as string;
+            session.backendToken = await new SignJWT({
+                provider: token.provider,
+                email: token.email,
+                name: token.name,
+                picture: token.picture,
+            })
+            .setProtectedHeader({ alg: "HS256" })
+            .setSubject(`${token.uid}`)
+            .setIssuedAt()
+            .setIssuer("yt-karaoke-tvan-front")
+            .setAudience("yt-karaoke-tvan-back")
+            .setExpirationTime("1h")
+            .sign(BACKEND_AUTH_SECRET);
+
             return session
         },
     },
