@@ -23,14 +23,23 @@ class BaseModel(DeclarativeBase):
 class User(BaseModel):
     __tablename__ = "users"
 
-    sub_id: Mapped[str] = mapped_column(unique=True, index=True)
+    auth_id: Mapped[str] = mapped_column()
+    provider: Mapped[str] = mapped_column(String(50))
     email: Mapped[str | None] = mapped_column(index=True)
     name: Mapped[str | None] = mapped_column()
     picture: Mapped[str | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     role: Mapped[UserRole] = mapped_column(
         Enum(UserRole, name="user_role"),
-        default=UserRole.USER.value,
+        default=UserRole.USER,
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "auth_id",
+            "provider",
+            name="user_auth_provider_pair"
+        ),
     )
 
     history: Mapped[list["History"]] = relationship(back_populates="user")
