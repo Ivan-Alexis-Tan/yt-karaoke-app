@@ -1,19 +1,14 @@
 "use server";
 
-import { bannedChannels } from "../appData";
 import { BASE_URL } from "../core/core";
 
-export async function getRandomVideos(videos_per_page: number = 15, limit: number = 30) {
+export async function getRandomVideos(videos_per_page: number = 15, limit: number = 30): Promise<VideoListResponse[]> {
     const params = new URLSearchParams
     params.append("videos_per_page", String(videos_per_page))
     params.append("limit", String(limit))
 
     const fetched = await fetch(`${BASE_URL}/videos/random?${params.toString()}`)
-    const json: VideoListResponse[] = await fetched.json()
-
-    return json.map(item => item.filter(
-        vid => !bannedChannels.includes(vid.channel_title))
-    )
+    return await fetched.json()
 
 }
 
