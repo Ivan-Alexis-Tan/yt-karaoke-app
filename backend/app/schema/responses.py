@@ -1,4 +1,7 @@
 from pydantic import BaseModel
+from datetime import datetime
+
+from app.models.models import UserRole
 
 class VideoListResponse(BaseModel):
     position: int | None = None
@@ -10,3 +13,14 @@ class VideoListResponse(BaseModel):
     thumbnail_width: int
     thumbnail_height: int
     duration_sec: int | None = None
+
+
+class CurrentUserResponse(BaseModel):
+    auth_id: str
+    provider: str
+    email: str | None = None
+    name: str | None = None
+    picture: str | None = None
+    created_at: datetime
+    role: UserRole
+    
