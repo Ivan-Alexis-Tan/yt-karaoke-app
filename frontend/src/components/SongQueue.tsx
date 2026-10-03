@@ -1,23 +1,32 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+// Next.js
+import { Dispatch, SetStateAction, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 
-import KaraokeVideoCard from "./KaraokeVideoCard";
-import CloseIcon from "../svgs/CloseIcon";
-import EmptyQueueIcon from "../svgs/EmptyQueueIcon";
-import DeleteIcon from "../svgs/DeleteIcon";
+// Custom useHook
 import useSongQueue, { 
     songQueueSelector, 
     deleteSongQueueSelector, 
     emptySongQueueSelector 
 } from "../utils/useSongQueue";
+
+// Components
+import { LogoutComponent } from "./LogoutComponent";
+import KaraokeVideoCard from "./KaraokeVideoCard";
+import CloseIcon from "../svgs/CloseIcon";
+import EmptyQueueIcon from "../svgs/EmptyQueueIcon";
+import DeleteIcon from "../svgs/DeleteIcon";
 import NoSongOnQueueIcon from "../svgs/NoSongOnQueueIcon";
 
 type SongQueueParams = { 
     closeFn: Dispatch<SetStateAction<boolean>>
-    className?: string 
+    currentPath: string
+    currentUser: CurrentUserResponse
+    className?: string
 }
-export default function SongQueue({ closeFn, className }: SongQueueParams) {
+export default function SongQueue({ closeFn, currentPath, currentUser, className }: SongQueueParams) {
     const [popupWindow, setPopupWindow] = useState(false)
     
     const songQueue = useSongQueue(songQueueSelector)
@@ -30,50 +39,84 @@ export default function SongQueue({ closeFn, className }: SongQueueParams) {
                 max-w-100 sm:max-w-150 w-full sm:w-[60%] 
                 h-[calc(100vh-4.2rem)] sm:h-[calc(100vh-5.2rem)] md:h-[calc(100vh-4.2rem)] 
                 fixed top-17 sm:top-21 md:top-17 right-0 
-                rounded-l-xl bg-(--gray-clr) overflow-auto
+                flex flex-col rounded-l-xl bg-(--gray-clr) overflow-auto
         `}>
-            {songQueue.length >= 1
-                ? <div className="relative">
-                    <div className="gap-3 sticky top-0 right-0 z-(--z-pop-sidebar) bg-(--gray-clr) flex justify-end">
-                        <button onClick={_ => setPopupWindow(true)} className="hover:text-(--red-clr)">
+            {/* Top buttons of the Song Queue Window */}
+            <div className="gap-3 p-1 px-2 sticky top-0 right-0 z-(--z-pop-sidebar) bg-(--gray-clr) flex justify-between items-center">
+                <div className="flex items-center">
+                    {!currentUser
+                        && <Link href={"/login"}>
+                            Sign in
+                        </Link>
+                    }
+
+                    {currentUser
+                        && <div className="gap-4 flex">
+                            <Link href={"/profile"}
+                                title={currentUser.name}
+                            >
+                                <Image 
+                                    src={currentUser.picture}
+                                    width={30}
+                                    height={30}
+                                    alt={`${currentUser.name}'s profile picture`}
+                                    className="rounded-full"
+                                />
+                            </Link>
+                            <LogoutComponent />
+                        </div>
+                    }
+                </div>
+                
+                <div className="gap-2 flex items-center">
+                    {songQueue.length >= 1
+                        && <button onClick={_ => setPopupWindow(true)} className="hover:text-(--red-clr)">
                             <EmptyQueueIcon className="w-7 h-7" />
                         </button>
-                        <button className="hover:text-(--red-clr)"
-                            onClick={_ => closeFn(false)}
-                        >
-                            <CloseIcon className="w-7 h-7" />
-                        </button>
-                    </div>
+                    }
+                    <button className="hover:text-(--red-clr)"
+                        onClick={_ => closeFn(false)}
+                    >
+                        <CloseIcon className="w-7 h-7" />
+                    </button>
+                </div>
+            </div>
 
+            {/* Song Queue List Display */}
+            {songQueue.length >= 1
+                ? <div className="relative">
                     {songQueue.map(vid => (
                         <div key={vid.video_id} 
                             className="mx-3 relative hover:bg-(--light-gray-clr) lg:hover:[&>button]:flex rounded-2xl"
                         >
+                            {/* Song on queue video card */}
                             <div onClick={_ => deleteSongQueue(vid.video_id)}>
                                 <KaraokeVideoCard 
                                     video_details={vid}
+                                    currentUser={currentUser}
                                     disableQueBtn={true}
                                     className="[&_a]:grid-cols-1! sm:[&_a]:grid-cols-2!"
                                 />
                             </div>
                             
-                            <button className="flex lg:hidden w-10 h-10 absolute bottom-2 right-2 justify-center items-center hover:bg-background rounded-full"
-                                onClick={_ => {
-                                    deleteSongQueue(vid.video_id)
-                                }}
-                                title="Remove song from queue"
+                            {/* Delete from song queue button */}
+                            <div className="flex lg:hidden absolute bottom-2 right-2
+                                hover:[&_button.more-option-btn]:bg-(--lucent-blk-clr)"
                             >
-                                <DeleteIcon className="w-7 h-7" />
-                            </button>
+                                <button className=""
+                                    onClick={_ => {
+                                        deleteSongQueue(vid.video_id)
+                                    }}
+                                    title="Remove song from queue"
+                                >
+                                    <DeleteIcon className="w-7 h-7" />
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>
                 :<div className="w-full h-full relative flex justify-center items-center">
-                    <button className="absolute top-0 right-2 hover:text-(--red-clr)"
-                        onClick={_ => closeFn(false)}
-                    >
-                        <CloseIcon className="w-7 h-7" />
-                    </button>
+                    {/* No song on queue Display */}
                     <div className="flex flex-col justify-center items-center">
                         <NoSongOnQueueIcon className="w-15 h-15" />
                         <p className="text-xl">No song currently on queue</p>
