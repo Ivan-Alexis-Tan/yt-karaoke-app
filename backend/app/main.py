@@ -2,12 +2,18 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 # Routers
-from app.routes import yt_api, videos, users
+from app.routes import (
+    yt_api, 
+    videos,
+    ban, 
+    users, 
+)
 
 app = FastAPI()
 
 app.include_router(yt_api.yt_router)
 app.include_router(videos.videos_router)
+app.include_router(ban.ban_router)
 app.include_router(users.user_router)
 
 origins = [
