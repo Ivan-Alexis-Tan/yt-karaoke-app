@@ -1,24 +1,29 @@
 "use client"
 
+// Next.js
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
+// Custom useHooks and their Components
+import useSongQueue, { songQueueSelector } from "@/src/utils/useSongQueue";
+import useCurrentVideo, { currentSongSelector } from "@/src/utils/useCurrentVideo";
+
+// Components
 import YoutubeIcon from "@/src/svgs/YoutubeIcon";
 import KaraokeMicIcon from "@/src/svgs/KaraokeMicIcon";
 import QueueIcon from "@/src/svgs/QueueIcon";
 import SongQueue from "@/src/components/SongQueue";
 import NavbarSearchBar from "./NavbarSearchBar";
-import useCurrentVideo, { currentSongSelector } from "@/src/utils/useCurrentVideo";
 import PlayIcon from "@/src/svgs/PlayIcon";
-import useSongQueue, { songQueueSelector } from "@/src/utils/useSongQueue";
 
-export default function Navbar({ className }: { className?: string }) {
+
+export default function Navbar({ className, currentUser }: { className?: string, currentUser: CurrentUserResponse }) {
     const [showQueue, setShowQueue] = useState<boolean>(false)
     const path = usePathname()
     const currentSong = useCurrentVideo(currentSongSelector)
     const songQueue = useSongQueue(songQueueSelector)
-    
+
     useEffect(() => {
         setShowQueue(false)
     }, [path])
@@ -60,8 +65,8 @@ export default function Navbar({ className }: { className?: string }) {
                 }
 
                 {/* User Tools */}
-                <div>
-                    {/* <MenuIcon className="w-10 h-10 sm:hidden" /> */}
+                <div className="max-w-40 min-w-0 flex gap-3 items-center justify-between">
+                    {/* Song Queue Button */}
                     <div className="relative mr-2 flex justify-center items-center">
                         <button onClick={_ => setShowQueue(p => !p)}
                             title={`${showQueue ? "Close" : "Open"} song queue`}
@@ -74,16 +79,21 @@ export default function Navbar({ className }: { className?: string }) {
                             {songQueue.length}
                         </div>
                     </div>
-                </div>
 
-                {showQueue 
-                    && <>
-                        <div className="w-full h-full fixed top-18 left-0"
-                            onClick={_ => setShowQueue(false)}
-                        />
-                        <SongQueue closeFn={setShowQueue} />
-                    </>
-                }
+                    {/* Song Queue UI */}
+                    {showQueue 
+                        && <>
+                            <div className="w-full h-full fixed top-18 left-0"
+                                onClick={_ => setShowQueue(false)}
+                            />
+                            <SongQueue 
+                                currentPath={currentPage}
+                                currentUser={currentUser}
+                                closeFn={setShowQueue} 
+                            />
+                        </>
+                    }
+                </div>
             </div>
         </nav>
     )
