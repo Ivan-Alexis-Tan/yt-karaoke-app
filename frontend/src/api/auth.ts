@@ -19,11 +19,16 @@ export async function logout() {
 }
 
 export async function getCurrentUser(session: Session) {
-    const fetched = await fetch(`${BASE_URL}/users`, {
+    const res = await fetch(`${BASE_URL}/users`, {
         headers: {
             Authorization: `Bearer ${session.backendToken}`
         },
-    })
+    });
 
-    return await fetched.json()
+    if (!res.ok) {
+        const body = await res.text()
+        throw new Error(`getCurrentUser failed: ${res.status} ${body.slice(0, 300)}`)
+    } 
+
+    return await res.json()
 }
