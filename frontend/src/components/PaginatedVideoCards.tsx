@@ -1,15 +1,17 @@
 "use client"
 
-import KaraokeVideoCard from "@/src/components/KaraokeVideoCard"
 import { use, useState } from "react"
+
+import KaraokeVideoCard from "@/src/components/KaraokeVideoCard"
 
 type PaginatedVideoCardsProps = {
     videoList: Promise<VideoListResponse[]>
+    currentUser: CurrentUserResponse | null
     arrange_videos?: "row" | "col"
     className?: string
 }
 
-export default function PaginatedVideoCards({ videoList, arrange_videos = "row", className }: PaginatedVideoCardsProps) {
+export default function PaginatedVideoCards({ videoList, currentUser, arrange_videos = "row", className }: PaginatedVideoCardsProps) {
     const [openPages, setOpenPages] = useState(1)
     const randVidList = use(videoList)
 
@@ -26,6 +28,7 @@ export default function PaginatedVideoCards({ videoList, arrange_videos = "row",
                     <KaraokeVideoCard key={vid.video_id}
                         video_details={vid}
                         arrange={arrange_videos}
+                        currentUser={currentUser}
                         className="mx-auto max-w-200 lg:max-w-"
                     />
                 )))}

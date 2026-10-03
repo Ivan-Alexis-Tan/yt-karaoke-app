@@ -4,11 +4,13 @@ import Link from "next/link"
 import Image from "next/image"
 
 import { formatMinutesSeconds } from "../utils/helpers"
-import { bannedChannels } from "../appData"
+import { tempBannedChannels } from "../utils/tempBannedChannels";
+
 import VideoCardOption from "./VideoCardOption";
 
 export type KaraokeVideoCardType = {
     video_details: VideoListResponse[number]
+    currentUser: CurrentUserResponse | null
     arrange?: "row" | "col"
     disableQueBtn?: boolean
     className?: string
@@ -16,6 +18,7 @@ export type KaraokeVideoCardType = {
 
 export default function KaraokeVideoCard({
     video_details,
+    currentUser,
     arrange = "row",
     disableQueBtn = false,
     className,
@@ -25,10 +28,10 @@ export default function KaraokeVideoCard({
     return (
         <div className={`${className ?? ""} karaoke-video-card relative hover:bg-(--gry-700) hover:[&_div.card-button]:flex rounded-2xl transition-all`}>
             
-            {/* Video card information */}
+            {/* Actual Video card */}
             <Link className={`
                     gap-3 p-2 grid items-center
-                    ${bannedChannels.includes(video_details.channel_title) && "hidden"} 
+                    ${tempBannedChannels.includes(video_details.channel_title) && "hidden"} 
                     ${arrange === "row" ? "grid-cols-2" : "grid-cols-1"}
                 `}
                 href={`/play/${video_details.video_id}`}
@@ -51,7 +54,14 @@ export default function KaraokeVideoCard({
             </Link>
 
             {/* Options button */}
-            {!disableQueBtn && <VideoCardOption video_details={video_details} />}
+            {!disableQueBtn && <VideoCardOption 
+                video_details={video_details} 
+                currentUser={currentUser}
+                className="w-10 h-10 
+                    flex lg:hidden absolute bottom-2 right-2 justify-center items-center 
+                    hover:[&_button.more-option-btn]:bg-(--lucent-blk-clr)
+                "
+            />}
 
         </div>
     )

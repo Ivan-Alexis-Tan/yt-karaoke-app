@@ -1,1 +1,1 @@
-export const tempBannedChannels = []
+export const tempBannedChannels: string[] = []
