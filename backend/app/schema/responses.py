@@ -23,4 +23,10 @@ class CurrentUserResponse(BaseModel):
     picture: str | None = None
     created_at: datetime
     role: UserRole
+
+
+class BannedChannelsResponse(BaseModel):
+    channel_id: str
+    channel_title: str
+    date: datetime
     
