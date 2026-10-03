@@ -3,8 +3,8 @@ import "./globals.css";
 
 import { Geist, Geist_Mono } from "next/font/google";
 
-import Navbar from "./Navbar";
 import AuthProvider from "@/src/components/AuthProvider";
+import NavbarServer from "./NavbarServer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,7 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <AuthProvider>
-          <Navbar className="px-5 py-3 z-(--z-navbar) sticky top-0 left-0 bg-(--lucent-blk-clr-75)" />
+          <NavbarServer className="px-5 py-3 z-(--z-navbar) sticky top-0 left-0 bg-(--lucent-blk-clr-75)" />
           
           <main>
             {children}
