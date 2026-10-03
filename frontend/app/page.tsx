@@ -1,12 +1,14 @@
 import { Suspense } from "react";
 
 import { getRandomVideos } from "@/src/api/videosApi";
+import { auth } from "@/auth";
+import { getCurrentUser } from "@/src/api/auth";
 
 import VideoCardSkeleton from "@/src/components/skeletons/VideoCardSkeleton";
 import PaginatedVideoCards from "../src/components/PaginatedVideoCards";
 
-export default async function Home() {
 
+export default async function Home() {
   return (
     <div className="pb-5 bg-zinc-50 font-sans dark:bg-black">
       <Suspense fallback={<div className="
@@ -28,8 +30,10 @@ export default async function Home() {
   );
 }
 
-const RandomVidsResult = () => {
+const RandomVidsResult = async () => {
   const randomVideos = getRandomVideos(15, 60)
+  const session = await auth()
+  const currentUser = session ? await getCurrentUser(session) : null
   
   return (
     <PaginatedVideoCards 
@@ -39,6 +43,7 @@ const RandomVidsResult = () => {
         items-start justify-between bg-white dark:bg-black [&_div.karaoke-video-card]:w-full
       "
       videoList={randomVideos} 
+      currentUser={currentUser}
       arrange_videos="col"  
     />
   )
