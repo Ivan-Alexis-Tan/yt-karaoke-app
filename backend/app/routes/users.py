@@ -10,5 +10,5 @@ user_router = APIRouter(prefix="/api/users", tags=["users"])
 security = HTTPBearer()
 
 @user_router.get("", response_model=CurrentUserResponse, status_code=status.HTTP_200_OK)
-async def current_user(db: db_dependency, credentials: HTTPAuthorizationCredentials = Depends(security)):
-    return auth.current_user(credentials, db)
+async def current_user(current_user: auth.CurrentUser):
+    return current_user

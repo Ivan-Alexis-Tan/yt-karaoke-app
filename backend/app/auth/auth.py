@@ -1,5 +1,5 @@
 from fastapi import HTTPException, Depends
-from fastapi.security import HTTPAuthorizationCredentials
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from starlette import status
 import jwt
 from typing import Annotated
@@ -8,6 +8,8 @@ from app.db import db_dependency
 from app.type import auth as auth_type
 from app.core import config
 from app.models import models
+
+bearer = HTTPBearer()
 
 not_authorized_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
@@ -32,7 +34,7 @@ def decode_token(credentials: HTTPAuthorizationCredentials):
     return payload
 
 
-def current_user(credentials: HTTPAuthorizationCredentials, db: db_dependency):
+def current_user(db: db_dependency, credentials: Annotated[HTTPAuthorizationCredentials, Depends(bearer)]):
     # Decode JWT token
     payload = decode_token(credentials)
 
@@ -44,6 +46,7 @@ def current_user(credentials: HTTPAuthorizationCredentials, db: db_dependency):
 
 
     if exists:
+        print(">>> User exists")
         exists.email = payload.get("email")
         exists.name = payload.get("name")
         exists.picture = payload.get("picture")
@@ -51,6 +54,7 @@ def current_user(credentials: HTTPAuthorizationCredentials, db: db_dependency):
 
         return exists
 
+    print(">>> User does not exists, creating one...")
     new_user = models.User(
         auth_id = payload.get("sub"),
         provider = payload.get("provider"),
