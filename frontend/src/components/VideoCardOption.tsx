@@ -2,12 +2,17 @@
 
 // Next.js
 import { useState } from "react"
+import { useSession } from "next-auth/react";
+import { Session } from "next-auth";
 
 // Types
 import { QueueNotifType } from "../types/states"
 
-// Custom useHooks
+// Custom useHooks and Other Functional imports
 import useSongQueue, { addSongQueueSelector, songQueueSelector } from "../utils/useSongQueue"
+import useCurrentVideo, { updateTempBannedChannelsSelector } from "../utils/useCurrentVideo";
+import PopupWindow, { usePopupWindow } from "./PopupWindow";
+import { banVideo } from "../api/ban";
 
 // Components
 import AddToListIcon from "../svgs/AddToListIcon"
@@ -24,11 +29,14 @@ type VideoCardOptionProps = {
 }
 
 export default function VideoCardOption({ video_details, currentUser, className }: VideoCardOptionProps) {
-    const [queueNotif, setQueueNotif] = useState<QueueNotifType>("none")
-    const [openMore, setOpenMore] = useState(false)
+    const { data: session } = useSession();
+    const { showPopup, openPopup, popupWindowStates } = usePopupWindow({ "banWindow": false });
+    const [queueNotif, setQueueNotif] = useState<QueueNotifType>("none");
+    const [openMore, setOpenMore] = useState(false);
 
     const songQueue = useSongQueue(songQueueSelector)
     const addSongQueue = useSongQueue(addSongQueueSelector)
+    const updateTempBannedChannels = useCurrentVideo(updateTempBannedChannelsSelector)
 
     function addToQueue() {
         const exists = songQueue.find(vid => vid.video_id === video_details.video_id)
@@ -70,7 +78,9 @@ export default function VideoCardOption({ video_details, currentUser, className 
                                         </button>
 
                                         {currentUser.role === "admin"
-                                            && <button className="rounded-b">
+                                            && <button className="rounded-b"
+                                                onClick={_ => openPopup("banWindow")}
+                                            >
                                                 <BanIcon className="w-7 h-7 text-background" />
                                                 Ban Channel
                                             </button>
@@ -113,6 +123,21 @@ export default function VideoCardOption({ video_details, currentUser, className 
                             }
                         </>
                 )
+            }
+
+            {showPopup.banWindow
+                && <PopupWindow 
+                    windowId="banWindow"
+                    popupWindowStates={popupWindowStates}
+                    headerText="Confirm Ban Channel"
+                    confirmFn={() => {
+                        banVideo(video_details, session as Session)
+                        updateTempBannedChannels(video_details.channel_title)
+                        setOpenMore(false)
+                    }}
+                    subHeaderText={`Ban "${video_details.channel_title}"?`}
+                    confirmBtnMode="warning"
+                />
             }
         </div>
     )
