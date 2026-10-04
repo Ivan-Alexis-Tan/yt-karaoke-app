@@ -3,6 +3,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload, joinedload
 from typing import List
+from starlette import status
 
 from app.db import db_dependency
 from app.auth.auth import CurrentUser, not_authorized_exception
@@ -35,9 +36,27 @@ def get_banned_channels(db: db_dependency, offset: int = 1):
     ).mappings().all()
 
 
-@ban_router.post("/channels")
-async def ban_video(db: db_dependency, current_user: CurrentUser, credentials: HTTPAuthorizationCredentials = Depends(security)):
+@ban_router.post("/videos/{video_id}", status_code=status.HTTP_201_CREATED)
+async def ban_video(video_id: str, db: db_dependency, current_user: CurrentUser):
     if current_user.role != models.UserRole.ADMIN:
         raise not_authorized_exception
-    
-    return
+
+    query = db.execute(
+        select(models.Video, models.BannedVideo)
+        .outerjoin(models.BannedVideo, models.BannedVideo.video_id == models.Video.video_id)
+        .where(models.Video.video_id == video_id)
+    ).first()
+
+    video, banned_video = query
+
+    if banned_video:
+        raise HTTPException(
+            status_code=status.HTTP_204_NO_CONTENT,
+            detail="Already exists."
+        )
+
+    db.add(models.BannedVideo(
+        video_id = video.video_id,
+        channel_id = video.channel_id
+    ))
+    db.commit()
