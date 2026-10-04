@@ -1,34 +1,43 @@
 import { create } from "zustand";
 import { getVideo } from "../api/videosApi";
 
-type UseVideosStates = {
+type UseCurrentVideosStates = {
     currentSong: VideoListResponse[number] | null
     searchKey: string
     searchVideoList: VideoListResponse
+    tempBannedChannels: VideoListResponse[number]["channel_title"][]
     updateCurrentSong: (videoId: VideoIdType) => void
     updateVideoList: (videoList: VideoListResponse) => void
     updateSearchKey: (key: string) => void
+    updateTempBannedChannels: (video: VideoListResponse[number]["channel_title"]) => void
 }
 
-export const useCurrentVideo = create<UseVideosStates>((set) => ({
+export const useCurrentVideo = create<UseCurrentVideosStates>((set) => ({
     currentSong: null,
     searchKey: "",
     searchVideoList: [],
+    tempBannedChannels: [],
     updateCurrentSong: async (videoId: VideoIdType) => {
         const fetched = await getVideo(videoId)
         set(_ => ({ currentSong:  fetched }) )
     },
     updateVideoList: (videoList: VideoListResponse) => set(s => ({ ...s, searchVideoList: videoList}) ),
     updateSearchKey: (key: string) => set(s => ({ ...s, searchKey: key }) ),
+    updateTempBannedChannels: (video: VideoListResponse[number]["channel_title"]) => set(
+        s => ({ ...s, tempBannedChannels: [...s.tempBannedChannels, video] })
+    )
 }))
 
-export const currentSongSelector = (state: UseVideosStates) => state.currentSong
-export const addCurrentSongSelector = (state: UseVideosStates) => state.updateCurrentSong
+export const currentSongSelector = (state: UseCurrentVideosStates) => state.currentSong
+export const addCurrentSongSelector = (state: UseCurrentVideosStates) => state.updateCurrentSong
 
-export const searchKeySelector = (state: UseVideosStates) => state.searchKey
-export const updateSearchKeySelector = (state: UseVideosStates) => state.updateSearchKey
+export const searchKeySelector = (state: UseCurrentVideosStates) => state.searchKey
+export const updateSearchKeySelector = (state: UseCurrentVideosStates) => state.updateSearchKey
 
-export const videoListSelector = (state: UseVideosStates) => state.searchVideoList
-export const updateVideoListSelector = (state: UseVideosStates) => state.updateVideoList
+export const videoListSelector = (state: UseCurrentVideosStates) => state.searchVideoList
+export const updateVideoListSelector = (state: UseCurrentVideosStates) => state.updateVideoList
+
+export const tempBannedChannelsSelector = (state: UseCurrentVideosStates) => state.tempBannedChannels
+export const updateTempBannedChannelsSelector = (state: UseCurrentVideosStates) => state.updateTempBannedChannels
 
 export default useCurrentVideo
