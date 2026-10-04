@@ -8,12 +8,10 @@ export function usePopupWindow(popupWindowIds: PopupWindowIds) {
 
     // Show or close window switch
     function openPopup(popupWindowId: keyof PopupWindowIds) {
-        console.log(`showPopup =`, showPopup)
         setShowPopup(p => ({...p, [popupWindowId]: true}))
     }
 
     function closePopup(popupWindowId: keyof PopupWindowIds) {
-        console.log(`showPopup =`, showPopup)
         setShowPopup(p => ({...p, [popupWindowId]: false}))
     }
     
@@ -55,7 +53,7 @@ export default function PopupWindow({
 ) {
     const { closePopup } = popupWindowStates
     return (
-        <div className={`${className ?? ""} fixed top-0 left-0 w-full h-full flex justify-center items-center bg-(--lucent-blk-clr)`}>
+        <div className={`${className ?? ""} fixed top-0 left-0 w-full h-full z-(--z-popup-window) flex justify-center items-center bg-(--lucent-blk-clr)`}>
             <div className="w-100 h-80 flex flex-col justify-evenly items-center bg-(--light-gray-clr) text-white rounded-2xl">
                 <h3 className="text-xl font-bold">{headerText}</h3>
                 {subHeaderText && <p>{subHeaderText}</p>}
@@ -67,10 +65,7 @@ export default function PopupWindow({
                         {confirmBtnText}
                     </button>
                     
-                    <button onClick={_ => {
-                        console.log()
-                        closePopup(windowId)
-                    }}
+                    <button onClick={_ => closePopup(windowId)}
                         className="hover:bg-white hover:text-black"
                     >
                         {cancelBtnText}
