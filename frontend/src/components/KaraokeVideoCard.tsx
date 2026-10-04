@@ -1,11 +1,14 @@
 "use client";
 
+// Next.js
 import Link from "next/link"
 import Image from "next/image"
 
+// Helpers and useHooks
 import { formatMinutesSeconds } from "../utils/helpers"
-import { tempBannedChannels } from "../utils/tempBannedChannels";
+import useCurrentVideo, { tempBannedChannelsSelector } from "../utils/useCurrentVideo";
 
+// Components
 import VideoCardOption from "./VideoCardOption";
 
 export type KaraokeVideoCardType = {
@@ -23,15 +26,19 @@ export default function KaraokeVideoCard({
     disableQueBtn = false,
     className,
 }: KaraokeVideoCardType) {
+    const tempBannedChannels = useCurrentVideo(tempBannedChannelsSelector)
     const duration = video_details.duration_sec ? formatMinutesSeconds(video_details.duration_sec) : ""
 
     return (
-        <div className={`${className ?? ""} karaoke-video-card relative hover:bg-(--gry-700) hover:[&_div.card-button]:flex rounded-2xl transition-all`}>
+        <div className={`${className ?? ""} karaoke-video-card 
+                relative hover:bg-(--gry-700) 
+                ${tempBannedChannels.includes(video_details.channel_title) && "hidden"} 
+                hover:[&_div.card-button]:flex rounded-2xl transition-all
+        `}>
             
             {/* Actual Video card */}
             <Link className={`
                     gap-3 p-2 grid items-center
-                    ${tempBannedChannels.includes(video_details.channel_title) && "hidden"} 
                     ${arrange === "row" ? "grid-cols-2" : "grid-cols-1"}
                 `}
                 href={`/play/${video_details.video_id}`}
@@ -62,7 +69,6 @@ export default function KaraokeVideoCard({
                     hover:[&_button.more-option-btn]:bg-(--lucent-blk-clr)
                 "
             />}
-
         </div>
     )
 }
