@@ -45,13 +45,15 @@ export default function SongQueue({ closeFn, currentPath, currentUser, className
             <div className="gap-3 p-1 px-2 sticky top-0 right-0 z-(--z-pop-sidebar) bg-(--gray-clr) flex justify-between items-center">
                 <div className="flex items-center">
                     {!currentUser
-                        && <Link href={"/login"}>
+                        && <Link href={"/login"}
+                            className="p-1 rounded-full hover:text-background hover:bg-green-400"
+                        >
                             Sign in
                         </Link>
                     }
 
                     {currentUser
-                        && <div className="gap-4 flex">
+                        && <div className="gap-4 flex [&_button]:p-1 [&_button]:rounded-full [&_button]:hover:bg-(--red-clr)">
                             <Link href={"/profile"}
                                 title={currentUser.name}
                             >
