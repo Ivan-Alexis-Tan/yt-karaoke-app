@@ -124,3 +124,14 @@ main input:focus-visible {
     display: block;
   }
 }
+
+/* Admin link in profile page */
+.profile-container {
+  .admin-link {
+    @media (width >= 480px) {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+    }
+  }
+}
