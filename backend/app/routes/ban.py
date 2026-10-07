@@ -13,6 +13,58 @@ from app.schema.responses import BannedChannelsResponse
 ban_router = APIRouter(prefix="/api/ban", tags=["banned"])
 security = HTTPBearer()
 
+@ban_router.get("/videos/total_rows")
+def banned_videos_count(db: db_dependency):
+    return db.execute(
+        select(func.count(models.BannedVideo.video_id))
+    ).scalar()
+
+
+@ban_router.get("/videos", response_model=List[BannedVideosResponse])
+def get_banned_videos(db: db_dependency, page: int = 1):
+    if page <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Page can't be less than or equal to 0"
+        )
+    
+    total_rows = db.execute(
+        select(
+            func.count(models.BannedVideo.video_id)
+        )
+    ).scalar()
+
+    max_page = total_rows / 5
+    if page > max_page:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Max page reached"
+        )
+
+    query = db.execute(
+        select(models.BannedVideo)
+        .options(
+            joinedload(models.BannedVideo.video),
+            joinedload(models.BannedVideo.channel)
+        )
+        .order_by(models.BannedVideo.date.desc())
+        .limit(page * 5)
+    ).scalars().all()
+
+    return [
+        BannedVideosResponse(
+            date = banned_video.date,
+            video_id = banned_video.video_id,
+            video_title = banned_video.video.title,
+            channel_id = banned_video.channel_id,
+            channel_title = banned_video.channel.name,
+            thumbnail_url = banned_video.video.thumbnail_url,
+            duration_sec = banned_video.video.duration_sec,
+        )
+        for banned_video in query
+    ]
+
+
 @ban_router.get("/channels", response_model=List[BannedChannelsResponse])
 def get_banned_channels(db: db_dependency, page: int = 1):
     earliest_date = func.min(models.BannedVideo.date).label("date")
