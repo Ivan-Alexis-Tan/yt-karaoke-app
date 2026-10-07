@@ -29,4 +29,13 @@ class BannedChannelsResponse(BaseModel):
     channel_id: str
     channel_title: str
     date: datetime
-    
+
+
+class BannedVideosResponse(BaseModel):
+    date: datetime
+    video_id: str
+    video_title: str
+    channel_id: str
+    channel_title: str
+    thumbnail_url: str
+    duration_sec: int
