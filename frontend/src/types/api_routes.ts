@@ -12,3 +12,24 @@ type VideoType = {
 }
 
 type VideoListResponse = VideoType[]
+
+// Banned Channels Types
+type BannedChannels = {
+    channel_id: VideoType["channel_id"]
+    channel_title: VideoType["channel_title"]
+    date: string
+}
+
+type BannedChannelsResponse = BannedChannels[]
+
+// Banned Videos Types
+type BannedVideos = {
+    date: string
+    video_id: VideoType["video_id"]
+    video_title: VideoType["video_title"]
+    channel_id: VideoType["channel_id"]
+    channel_title: VideoType["channel_title"]
+    thumbnail_url: VideoType["thumbnail_url"]
+    duration_sec: VideoType["duration_sec"]
+}
+type BannedVideosResponse = BannedVideos[]
