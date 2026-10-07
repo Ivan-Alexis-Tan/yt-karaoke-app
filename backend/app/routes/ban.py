@@ -14,7 +14,7 @@ ban_router = APIRouter(prefix="/api/ban", tags=["banned"])
 security = HTTPBearer()
 
 @ban_router.get("/channels", response_model=List[BannedChannelsResponse])
-def get_banned_channels(db: db_dependency, offset: int = 1):
+def get_banned_channels(db: db_dependency, page: int = 1):
     earliest_date = func.min(models.BannedVideo.date).label("date")
     return db.execute(
         select(
@@ -31,8 +31,7 @@ def get_banned_channels(db: db_dependency, offset: int = 1):
             models.Channel.name
         )
         .order_by(earliest_date.desc())
-        .limit(5)
-        .offset(5 * offset)
+        .limit(page * 5)
     ).mappings().all()
 
 
