@@ -135,3 +135,14 @@ main input:focus-visible {
     }
   }
 }
+
+/* Data table */
+table.data-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th, td {
+    padding: 3px;
+    border: 1px solid;
+  }
+}
