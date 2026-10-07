@@ -59,7 +59,10 @@ export default function PopupWindow({
                 {subHeaderText && <p>{subHeaderText}</p>}
 
                 <div className="popup-btns w-full flex justify-evenly *:p-2 *:border *:border-foreground *:rounded-2xl">
-                    <button onClick={confirmFn}
+                    <button onClick={() => {
+                        confirmFn()
+                        closePopup(windowId)
+                    }}
                         className={`${confirmBtnMode === "warning" ? "hover:bg-(--red-clr) hover:border-(--red-clr)" : "hover:bg-green-400 hover:border-green-400 hover:text-(--lucent-blk-clr)"} `}
                     >
                         {confirmBtnText}
