@@ -18,7 +18,7 @@ export async function logout() {
     await signOut({ redirectTo: "/login" })
 }
 
-export async function getCurrentUser(session: Session) {
+export async function getCurrentUser(session: Session): Promise<CurrentUserResponse> {
     const res = await fetch(`${BASE_URL}/users`, {
         headers: {
             Authorization: `Bearer ${session.backendToken}`
