@@ -8,7 +8,7 @@ from starlette import status
 from app.db import db_dependency
 from app.auth.auth import CurrentUser, not_authorized_exception
 from app.models import models
-from app.schema.responses import BannedChannelsResponse
+from app.schema.responses import BannedChannelsResponse, BannedVideosResponse
 
 ban_router = APIRouter(prefix="/api/ban", tags=["banned"])
 security = HTTPBearer()
