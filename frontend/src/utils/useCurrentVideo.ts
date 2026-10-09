@@ -6,7 +6,7 @@ type UseCurrentVideosStates = {
     searchKey: string
     searchVideoList: VideoListResponse
     tempBannedChannels: VideoListResponse[number]["channel_title"][]
-    updateCurrentSong: (videoId: VideoIdType) => void
+    updateCurrentSong: (videoId: VideoType["video_id"]) => void
     updateVideoList: (videoList: VideoListResponse) => void
     updateSearchKey: (key: string) => void
     updateTempBannedChannels: (video: VideoListResponse[number]["channel_title"]) => void
@@ -17,7 +17,7 @@ export const useCurrentVideo = create<UseCurrentVideosStates>((set) => ({
     searchKey: "",
     searchVideoList: [],
     tempBannedChannels: [],
-    updateCurrentSong: async (videoId: VideoIdType) => {
+    updateCurrentSong: async (videoId: VideoType["video_id"]) => {
         const fetched = await getVideo(videoId)
         set(_ => ({ currentSong:  fetched }) )
     },

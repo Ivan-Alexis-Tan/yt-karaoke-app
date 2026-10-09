@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware"
 type UseSongQueueStates = {
     songQueue: VideoListResponse
     addSongQueue: (video: VideoListResponse[number]) => void
-    deleteSongQueue: (video_id: VideoIdType) => void
+    deleteSongQueue: (video_id: VideoType["video_id"]) => void
     emptySongQueue: () => void
 }
 
@@ -15,7 +15,7 @@ export const useSongQueue = create<UseSongQueueStates>()(
             addSongQueue: (video: VideoListResponse[number]) => set(
                 s => ({ songQueue: [...s.songQueue, video] })
             ),
-            deleteSongQueue: (video_id: VideoIdType) => set(
+            deleteSongQueue: (video_id: VideoType["video_id"]) => set(
                 s => ({ songQueue: s.songQueue.filter(vid => vid.video_id !== video_id) })
             ),
             emptySongQueue: () => set( _ => ({ songQueue: [] }) ),
