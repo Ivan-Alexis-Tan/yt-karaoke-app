@@ -1,8 +1,12 @@
+// Next.js
 import { Suspense } from "react";
+import { auth } from "@/auth";
+import { Session } from "next-auth";
 
 // Utils
 import { searchVideosLocal, searchVideosOnline } from "@/src/api/videosApi";
 import { capsWord } from "@/src/utils/helpers";
+import { getCurrentUser } from "@/src/api/auth";
 
 // Types
 import { SearchMode } from "@/src/types/states";
@@ -20,6 +24,7 @@ type SearchPageProps = {
 export default async function SearchPage({ searchParams, params }: SearchPageProps) {
     const { searchMode } = await params;
     const { query } = await searchParams;
+    const session = await auth()
 
     return (
         <Suspense key={searchMode + query} 
@@ -27,12 +32,16 @@ export default async function SearchPage({ searchParams, params }: SearchPagePro
                 className="adapt-vh-scrn mx-5 flex flex-col justify-center items-center" 
             />}
         >
-            <SearchResults searchMode={searchMode} query={query} />
+            <SearchResults searchMode={searchMode} query={query} session={session as Session} />
         </Suspense>
     )
 }
 
-const SearchResults = async ({ searchMode, query }: { searchMode: SearchMode, query: string }) => {
+const SearchResults = async ({ searchMode, query, session }: { 
+    searchMode: SearchMode, 
+    query: string,
+    session: Session
+}) => {
     async function generateSearch(): Promise<VideoListResponse> {
         if (searchMode === "local") return await searchVideosLocal(query);
 
@@ -40,6 +49,7 @@ const SearchResults = async ({ searchMode, query }: { searchMode: SearchMode, qu
     }
 
     const searchResults = await generateSearch()
+    const currentUser = await getCurrentUser(session)
     
     return (
         <div className={`mx-5 mb-5 flex flex-col justify-center`}>
@@ -57,6 +67,7 @@ const SearchResults = async ({ searchMode, query }: { searchMode: SearchMode, qu
                     {searchResults.map(vid => (
                         <KaraokeVideoCard key={vid.video_id}
                             video_details={vid}
+                            currentUser={currentUser}
                             className="[&_a]:grid-cols-1 sm:[&_a]:grid-cols-2"
                         />
                     ))}
