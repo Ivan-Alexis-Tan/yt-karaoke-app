@@ -1,10 +1,13 @@
 "use client"
 
-import { Suspense, useEffect, useState } from "react";
+// Next.js imports
+import { Suspense, useEffect, useState, use } from "react";
 
+// useHooks, Utils, and other helper functions
 import useSongQueue, { songQueueSelector, deleteSongQueueSelector } from "@/src/utils/useSongQueue";
 import useCurrentVideo, { addCurrentSongSelector } from "@/src/utils/useCurrentVideo";
 
+// Components
 import KaraokePlayer from "./KaraokePlayer";
 import SongNoteIcon from "@/src/svgs/SongNoteIcon";
 import SearchIcon from "@/src/svgs/SearchIcon";
@@ -17,12 +20,13 @@ import VideoCardSkeleton from "@/src/components/skeletons/VideoCardSkeleton";
 type MainPlayerProps = {
     videoId: string
     videoList: Promise<VideoListResponse[]>
+    currentUser: Promise<CurrentUserResponse> | null
     className?: string 
 }
 
 type PaneKeys = "hide" | "songs" | "search"
 
-export default function MainPlayer({ videoId, videoList, className }: MainPlayerProps) {
+export default function MainPlayer({ videoId, videoList, currentUser, className }: MainPlayerProps) {
     const [showPane, setShowPane] = useState<PaneKeys>("songs")
     const currentVideo = useCurrentVideo(addCurrentSongSelector)
 
@@ -87,9 +91,7 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
                                 className="player-video-karaoke mx-auto max-w-200 lg:max-w-" 
                             />
                         ))}>
-                            <PaginatedVideoCards videoList={videoList}
-                                className="player-video-karaoke [&_a.karaoke-video-card]:mx-5 lg:[&_div.karaoke-video-card]:mx-0 lg:[&_div.karaoke-video-card]:mr-5"   
-                            />
+                            <VideoCardList videoList={videoList} currentUser={currentUser} />
                         </Suspense>
                     </div>
                 }
@@ -99,5 +101,18 @@ export default function MainPlayer({ videoId, videoList, className }: MainPlayer
                 }
             </>
         </div>
+    )
+}
+
+
+const VideoCardList = ({ videoList, currentUser }: { 
+    videoList: Promise<VideoListResponse[]>,
+    currentUser: Promise<CurrentUserResponse> | null
+}) => {
+    const userSession = currentUser ? use(currentUser) : null
+    return (
+        <PaginatedVideoCards videoList={videoList} currentUser={userSession}
+            className="player-video-karaoke [&_a.karaoke-video-card]:mx-5 lg:[&_div.karaoke-video-card]:mx-0 lg:[&_div.karaoke-video-card]:mr-5"   
+        />
     )
 }

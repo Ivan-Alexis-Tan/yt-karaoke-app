@@ -1,5 +1,7 @@
 import { cacheToHistory, getRandomVideos } from "@/src/api/videosApi";
 import MainPlayer from "./MainPlayer";
+import { getCurrentUser } from "@/src/api/auth";
+import { auth } from "@/auth";
 
 type PlayerPageProps = {
     params: Promise<{videoId: string}>
@@ -7,7 +9,9 @@ type PlayerPageProps = {
 
 export default async function PlayerPage({ params }: PlayerPageProps) {
     const videoId = (await params).videoId;
+    const session = await auth()
     const randomVideos = getRandomVideos()
+    const currentUser = session ? getCurrentUser(session) : null
     // await cacheToHistory(videoId)
 
     return (
@@ -15,6 +19,7 @@ export default async function PlayerPage({ params }: PlayerPageProps) {
             <MainPlayer 
                 videoId={videoId}
                 videoList={randomVideos}
+                currentUser={currentUser}
                 className="h-full"
             />
         </div>
