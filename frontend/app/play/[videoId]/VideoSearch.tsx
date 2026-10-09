@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, use, useState } from "react";
 
 import { searchVideosLocal, searchVideosOnline } from "@/src/api/videosApi";
 import { SearchMode } from "@/src/types/states";
@@ -18,10 +18,12 @@ import Spinner from "@/src/components/Spinner";
 import SearchIcon from "@/src/svgs/SearchIcon";
 
 type VideoSearchProps = {
+    currentUserPromise: Promise<CurrentUserResponse> | null
     className?: string
 }
 
-export default function VideoSearch({ className }: VideoSearchProps) {
+export default function VideoSearch({ className, currentUserPromise }: VideoSearchProps) {
+    const currentUser = currentUserPromise ? use(currentUserPromise) : null
     const [search, setSearch] = useState<string>("")
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [searchMode, setSearchMode] = useState<SearchMode>("local")
@@ -80,6 +82,7 @@ export default function VideoSearch({ className }: VideoSearchProps) {
                                     {videoList.map(vid => (
                                         <KaraokeVideoCard key={vid.video_id}
                                             video_details={vid}
+                                            currentUser={currentUser}
                                             className="mx-auto max-w-200 lg:max-w-"
                                         />
                                     ))}

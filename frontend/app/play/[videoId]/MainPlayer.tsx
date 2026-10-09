@@ -97,7 +97,7 @@ export default function MainPlayer({ videoId, videoList, currentUser, className 
                 }
 
                 {showPane === "search"
-                    && <VideoSearch className="min-w-0 mx-5 lg:mx-0 lg:pr-5"/>
+                    && <VideoSearch currentUserPromise={currentUser} className="min-w-0 mx-5 lg:mx-0 lg:pr-5"/>
                 }
             </>
         </div>
