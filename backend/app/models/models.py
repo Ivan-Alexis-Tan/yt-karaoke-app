@@ -1,4 +1,10 @@
-from sqlalchemy import String, Text, ForeignKey, UniqueConstraint, Enum
+from sqlalchemy import (
+    String, 
+    Text, 
+    ForeignKey, 
+    UniqueConstraint, 
+    Enum as SAEnum
+)
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 import uuid
 from datetime import datetime
@@ -8,6 +14,12 @@ import enum
 class UserRole(enum.Enum):
     USER = "user"
     ADMIN = "admin"
+
+
+class BanRequestStatus(str, enum.Enum):
+    PENDING = 'pending'
+    APPROVED = 'approved'
+    REJECTED = 'rejected'
 
 
 class BaseModel(DeclarativeBase):
@@ -30,7 +42,7 @@ class User(BaseModel):
     picture: Mapped[str | None] = mapped_column()
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
     role: Mapped[UserRole] = mapped_column(
-        Enum(UserRole, name="user_role"),
+        SAEnum(UserRole, name="user_role"),
         default=UserRole.USER,
     )
 
@@ -145,6 +157,27 @@ class BannedVideo(BaseModel):
     video_id: Mapped[str] = mapped_column(ForeignKey('videos.video_id'), unique=True)
     channel_id: Mapped[str] = mapped_column(ForeignKey('channels.channel_id'), index=True)
     date: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    request_id: Mapped[Optional[str]] = mapped_column(ForeignKey('ban_requests.id'))
 
     video: Mapped["Video"] = relationship(back_populates="banned_video")
     channel: Mapped["Channel"] = relationship(back_populates="banned_videos")
+    ban_request: Mapped[Optional["BanRequest"]] = relationship()
+
+
+class BanRequest(BaseModel):
+    __tablename__ = "ban_requests"
+
+    date: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+    video_id: Mapped[str] = mapped_column(ForeignKey('videos.video_id'), unique=True)
+    reason: Mapped[Optional[str]] = mapped_column(Text)
+    requested_by: Mapped[Optional[str]] = mapped_column(ForeignKey('users.id'))
+    status: Mapped[BanRequestStatus] = mapped_column(
+        SAEnum(BanRequestStatus, name="ban_request_status"), 
+        default=BanRequestStatus.PENDING
+    )
+    reviewed_at: Mapped[Optional[datetime]] = mapped_column()
+    reviewed_by: Mapped[Optional[str]] = mapped_column(ForeignKey('users.id'))
+
+    video: Mapped['Video'] = relationship()
+    requested_user: Mapped[Optional['User']] = relationship(foreign_keys=[requested_by])
+    reviewed_user: Mapped[Optional['User']] = relationship(foreign_keys=[reviewed_by])
