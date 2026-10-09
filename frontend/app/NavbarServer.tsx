@@ -8,5 +8,5 @@ export default async function NavbarServer({ className }: { className?: string }
     const session = await auth()
     const currentUser = session ? await getCurrentUser(session) : null
 
-    return <Navbar className={className ?? ""} currentUser={currentUser} />
+    return <Navbar className={className ?? ""} currentUser={currentUser as CurrentUserResponse} />
 }
