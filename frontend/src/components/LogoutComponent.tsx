@@ -19,10 +19,11 @@ export function LogoutComponent() {
                     confirmFn={() => signOut({ redirectTo: "/login" })}
                     confirmBtnText="Logout"
                     confirmBtnMode="warning"
+                    className="[&_button]:p-3"
                 />
             }
 
-            <button onClick={_ => openPopup("logoutWindow")}>
+            <button className="logout-btn" onClick={_ => openPopup("logoutWindow")}>
                 Logout
             </button>
         </>

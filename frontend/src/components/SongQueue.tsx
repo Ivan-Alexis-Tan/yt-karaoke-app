@@ -53,7 +53,7 @@ export default function SongQueue({ closeFn, currentPath, currentUser, className
                     }
 
                     {currentUser
-                        && <div className="gap-4 flex [&_button]:p-1 [&_button]:rounded-full [&_button]:hover:bg-(--red-clr)">
+                        && <div className="gap-4 flex [&_button.logout-btn]:p-1 [&_button.logout-btn]:rounded-full [&_button.logout-btn]:hover:bg-(--red-clr)">
                             <Link href={"/profile"}
                                 title={currentUser.name}
                             >
