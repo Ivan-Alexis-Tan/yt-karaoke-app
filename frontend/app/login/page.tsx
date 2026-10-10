@@ -1,11 +1,22 @@
-import SignUpComponent from "./SignUp";
+// Utils and helper functions
+import { auth } from "@/auth";
 
-export default function SignUpPage() {
+// Components
+import SignUpComponent from "./SignUp";
+import LogoutFirstPopup from "./LogoutFirstWindow";
+
+export default async function SignUpPage() {
+    const session = await auth()
+    
     return (
-        <div>
-            <h2 className="text-2xl font-bold">Sign Up</h2>
+        <div className="mx-5">
+            <h2 className="text-2xl font-bold">Sign In</h2>
 
             <SignUpComponent />
+
+            {session
+                && <LogoutFirstPopup session={session} />
+            }
         </div>
     )
 }
