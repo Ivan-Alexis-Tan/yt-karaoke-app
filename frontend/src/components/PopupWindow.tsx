@@ -32,6 +32,7 @@ type PopupWindowProps = {
     }
     headerText: string
     confirmFn: () => any
+    cancelFn?: () => any
     subHeaderText?: string
     confirmBtnText?: string
     confirmBtnMode?: "confirm" | "warning"
@@ -44,6 +45,7 @@ export default function PopupWindow({
     popupWindowStates, 
     headerText,
     confirmFn,
+    cancelFn = () => {},
     subHeaderText,
     confirmBtnText = "Confirm",
     confirmBtnMode = "confirm",
@@ -54,9 +56,9 @@ export default function PopupWindow({
     const { closePopup } = popupWindowStates
     return (
         <div className={`${className ?? ""} fixed top-0 left-0 w-full h-full z-(--z-popup-window) flex justify-center items-center bg-(--lucent-blk-clr)`}>
-            <div className="w-100 h-80 flex flex-col justify-evenly items-center bg-(--light-gray-clr) text-white rounded-2xl">
+            <div className="w-100 h-80 px-3 flex flex-col justify-evenly items-center bg-(--light-gray-clr) text-white rounded-2xl">
                 <h3 className="text-xl font-bold">{headerText}</h3>
-                {subHeaderText && <p>{subHeaderText}</p>}
+                {subHeaderText && <p className="text-center">{subHeaderText}</p>}
 
                 <div className="popup-btns w-full flex justify-evenly *:p-2 *:border *:border-foreground *:rounded-2xl">
                     <button onClick={() => {
@@ -68,7 +70,10 @@ export default function PopupWindow({
                         {confirmBtnText}
                     </button>
                     
-                    <button onClick={_ => closePopup(windowId)}
+                    <button onClick={_ => {
+                        cancelFn()
+                        closePopup(windowId)
+                    }}
                         className="hover:bg-white hover:text-black"
                     >
                         {cancelBtnText}
