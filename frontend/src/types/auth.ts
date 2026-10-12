@@ -1,4 +1,4 @@
-type CurrentUserResponse = {
+type UserType = {
     auth_id: string
     provider: string
     email: string
@@ -7,3 +7,5 @@ type CurrentUserResponse = {
     created_at: string
     role: "admin" | "user"
 }
+
+type CurrentUserResponse = UserType
