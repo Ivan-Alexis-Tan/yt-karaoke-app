@@ -158,3 +158,21 @@ table.data-table {
     border: 1px solid;
   }
 }
+
+/* Ban Request Headers */
+.ban-req-headers {
+  gap: 12px;
+  justify-content: center;
+
+  > h3 {
+    width: 100%;
+  }
+
+  @media (width >= 400px) {
+    justify-content: space-between;
+    
+    > h3 {
+      width: auto;
+    }
+  }
+}

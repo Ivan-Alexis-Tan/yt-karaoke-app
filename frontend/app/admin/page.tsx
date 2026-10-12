@@ -11,6 +11,7 @@ import { getCurrentUser } from "@/src/api/auth"
 // Components
 import BannedVideos from "./BannedVideos"
 import BannedChannels from "./BannedChannels"
+import BanRequests from "./BanRequests"
 
 export default async function AdminPage() {
     const session = await auth()
@@ -26,7 +27,7 @@ export default async function AdminPage() {
 
     return (
         <div className="mx-5 *:mb-5">
-            
+
             {/* Admin Page Header Section */}
             <div className="gap-6 flex justify-between items-center">
                 <h1 className="text-3xl font-bold">Admin</h1>
@@ -45,13 +46,18 @@ export default async function AdminPage() {
                 </div>
             </div>
             
+            {/* Ban Request UI */}
+            <Suspense fallback={<h1 className="text-xl">Loading...</h1>}>
+                <BanRequests />
+            </Suspense>
+            
             {/* Banned Videos Section */}
-            <Suspense fallback={<h1>Loading...</h1>}>
+            <Suspense fallback={<h1 className="text-xl">Loading...</h1>}>
                 <BannedVideos currentUser={currentUser} className="p-1 border rounded" />
             </Suspense>
 
             {/* Banned Channels Section */}
-            <Suspense>
+            <Suspense fallback={<h1 className="text-xl">Loading...</h1>}>
                 <BannedChannels currentUser={session as Session} className="p-1 border rounded" />
             </Suspense>
         </div>
