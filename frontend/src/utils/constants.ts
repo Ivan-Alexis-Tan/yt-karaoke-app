@@ -1,0 +1,1 @@
+export const BAN_REQUEST_STATUS = ["pending", "approved", "rejected"]
