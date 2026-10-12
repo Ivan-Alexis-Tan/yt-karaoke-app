@@ -42,7 +42,3 @@ export async function getBannedVideos(page: number = 1): Promise<BannedVideosRes
 
     return await res.json()
 }
-
-// export async function requestBanVideo(video_id: VideoListResponse[number]["video_id"]) {
-//     await fetch(`${BASE_URL}`)
-// }
