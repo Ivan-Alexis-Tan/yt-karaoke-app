@@ -2,6 +2,7 @@
 
 // Next.js
 import { Session } from "next-auth";
+import { revalidatePath } from "next/cache";
 
 // Utils and other helpers
 import { BASE_URL } from "../core/core";
