@@ -46,13 +46,13 @@ type BanRequestType = {
     status: BanRequestStatus
     requested_by: string
     requested_user: BanRequestUser
-    reviewed_at: string | null
-    reviewed_by: BanRequestUser | null
     video: (
         Pick<VideoType, "video_id" | "video_title" | "thumbnail_url" | "duration_sec">
         & { channel: Pick<VideoType, "channel_id" | "channel_title">}
     )
-
+    reviewed_at: string | null
+    reviewed_by: BanRequestUser | null
+    reviewed_user: BanRequestUser | null
 }
 
 type BanRequestsResponse = BanRequestType[]
