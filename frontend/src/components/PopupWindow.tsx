@@ -57,7 +57,7 @@ export default function PopupWindow({
     return (
         <div className={`${className ?? ""} fixed top-0 left-0 w-full h-full z-(--z-popup-window) flex justify-center items-center bg-(--lucent-blk-clr)`}>
             <div className="w-100 h-80 px-3 flex flex-col justify-evenly items-center bg-(--light-gray-clr) text-white rounded-2xl">
-                <h3 className="text-xl font-bold">{headerText}</h3>
+                <h3 className="text-xl font-bold text-center">{headerText}</h3>
                 {subHeaderText && <p className="text-center">{subHeaderText}</p>}
 
                 <div className="popup-btns w-full flex justify-evenly *:p-2 *:border *:border-foreground *:rounded-2xl">
@@ -65,7 +65,13 @@ export default function PopupWindow({
                         confirmFn()
                         closePopup(windowId)
                     }}
-                        className={`${confirmBtnMode === "warning" ? "hover:bg-(--red-clr) hover:border-(--red-clr)" : "hover:bg-green-400 hover:border-green-400 hover:text-(--lucent-blk-clr)"} `}
+                        className={`
+                            ${confirmBtnMode === "warning" 
+                                ? "hover:bg-(--red-clr) hover:border-(--red-clr)" 
+                                : "hover:bg-green-400 hover:border-green-400 hover:text-(--lucent-blk-clr)"
+                            } 
+                            min-w-15
+                        `}
                     >
                         {confirmBtnText}
                     </button>
