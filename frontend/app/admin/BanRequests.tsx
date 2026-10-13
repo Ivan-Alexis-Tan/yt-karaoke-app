@@ -115,6 +115,13 @@ export default function BanRequests({ session }: { session: Session }) {
                 session={session}
                 className="max-h-200 mb-3 px-2 grid md:grid-cols-2 overflow-auto"
             />
+
+            {/* View More Button */}
+            <button onClick={_ => setLimit(p => p + 1)}
+                className="mx-auto w-30 block hover:bg-foreground hover:text-background border rounded-full"
+            >
+                View More
+            </button>
         </div>
     )
 }
