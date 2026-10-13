@@ -49,3 +49,35 @@ export async function requestBanVideo(
 
     return await res.json()
 }
+
+
+export async function approveBanRequest(banRequestId: string, session: Session) {
+    const res = await fetch(`${BASE_URL}/ban_requests/approve/${banRequestId}`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${session.backendToken}`},
+        cache: "no-store",
+    })
+
+    if (!res.ok) {
+        const body = await res.text()
+        throw new Error(`banVideo failed: ${res.status} ${body.slice(0, 300)}`)
+    }
+
+    revalidatePath("/admin")
+}
+
+
+export async function rejectBanRequest(banRequestId: string, session: Session) {
+    const res = await fetch(`${BASE_URL}/ban_requests/reject/${banRequestId}`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${session.backendToken}`},
+        cache: "no-store",
+    })
+
+    if (!res.ok) {
+        const body = await res.text()
+        throw new Error(`banVideo failed: ${res.status} ${body.slice(0, 300)}`)
+    }
+
+    revalidatePath("/admin")
+}
