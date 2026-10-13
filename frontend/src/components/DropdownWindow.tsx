@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+//  useDropdown Custom useHook =====================================================
 type UseDropdownType = {
     windowIds: Record<string, boolean>
 }
@@ -32,16 +33,24 @@ export function useDropdown(windowIds: UseDropdownType["windowIds"]) {
     }
 }
 
+// DropdownWindow Component =======================================
 type DropdownWindowProps = {
     dropdownId: keyof UseDropdownType["windowIds"]
     useDropdownStates: {
         closeDropdown: (key: keyof UseDropdownType["windowIds"]) => void,
     }
-    buttonOptions: React.ReactNode[]
+    buttonOptions: string[]
+    onClickFn: (option: string) => any
     className?: string
 }
 
-export default function DropdownWindow({ dropdownId, useDropdownStates, buttonOptions, className }: DropdownWindowProps) {
+export default function DropdownWindow({ 
+    dropdownId, 
+    useDropdownStates, 
+    buttonOptions,
+    onClickFn,
+    className 
+}: DropdownWindowProps) {
     const { closeDropdown } = useDropdownStates
     
     return (
@@ -57,6 +66,7 @@ export default function DropdownWindow({ dropdownId, useDropdownStates, buttonOp
                 {buttonOptions.map((option, idx) => (
                     <button key={idx}
                         onClick={_ => {
+                            onClickFn(option)
                             closeDropdown(`${dropdownId}`)
                         }}
                         className="w-full p-1 block text-left hover:bg-(--red-clr) hover:text-foreground"
