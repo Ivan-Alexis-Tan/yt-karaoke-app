@@ -5,6 +5,7 @@ import { Session } from "next-auth"
 
 // Utils and helper functions
 import { getCurrentUser } from "@/src/api/auth"
+import { adminDefaultSearchParams } from "@/src/utils/constants"
 
 // Components
 import GithubLogo from "@/src/svgs/GithubLogo"
@@ -44,7 +45,9 @@ export default async function CurrentUserProfile({ session }: { session: Session
 
             {/* Admin Page Link */}
             {currentUser.role === "admin"
-                && <Link href={"/admin"} className="admin-link p-1 border rounded-xl bg-green-400 hover:bg-green-300 text-black">
+                && <Link href={`/admin?${adminDefaultSearchParams.toString()}`} 
+                    className="admin-link p-1 border rounded-xl bg-green-400 hover:bg-green-300 text-black"
+                >
                     Admin Page
                 </Link>
             }
