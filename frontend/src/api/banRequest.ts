@@ -9,8 +9,8 @@ import { BASE_URL } from "../core/core";
 
 export async function getBanRequests(
     page: number = 1, 
-    date_order: "recent" | "old" = "recent", 
-    req_status: BanRequestStatus | "all" = "all"
+    date_order: DateOrderSearchParam = "recent", 
+    req_status: ReqStatusSearchParam = "all"
 ): Promise<BanRequestsResponse> {
     let params
 
