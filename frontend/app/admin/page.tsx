@@ -48,7 +48,7 @@ export default async function AdminPage() {
             
             {/* Ban Request UI */}
             <Suspense fallback={<h1 className="text-xl">Loading...</h1>}>
-                <BanRequests />
+                <BanRequests session={session as Session}/>
             </Suspense>
             
             {/* Banned Videos Section */}
