@@ -1,6 +1,5 @@
 "use client";
 // Next.js
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Session } from "next-auth";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -11,10 +10,7 @@ import { BAN_REQUEST_STATUS } from "@/src/utils/constants";
 import DropdownWindow, { useDropdown } from "@/src/components/DropdownWindow";
 
 // Components
-import ThumbsDownIcon from "@/src/svgs/ThumbsDownIcon";
-import ThumbsUpIcon from "@/src/svgs/ThumbsUpIcon";
 import TriangleArrowRightIcon from "@/src/svgs/TriangleArrowRightIcon";
-import ClockIcon from "@/src/svgs/ClockIcon";
 import BanRequestCards from "./BanRequestCards";
 
 type BanRequestFilters = {
