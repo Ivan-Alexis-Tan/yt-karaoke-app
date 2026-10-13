@@ -41,6 +41,7 @@ class BanRequestResponse(BaseModel):
     status: BanRequestStatus
     requested_by: str
     requested_user: BanRequestUser
-    reviewed_at: datetime | None
-    reviewed_by: BanRequestUser | None
     video: BanRequestVideo
+    reviewed_at: datetime | None
+    reviewed_by: str | None
+    reviewed_user: BanRequestUser | None
