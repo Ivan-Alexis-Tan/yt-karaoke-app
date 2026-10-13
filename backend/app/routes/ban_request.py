@@ -3,17 +3,24 @@ from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 from starlette import status
 import math
+from typing import Literal
+from datetime import datetime
 
 from app.models import models
 from app.db import db_dependency
-from app.auth.auth import CurrentUser
+from app.auth.auth import CurrentUser, not_authorized_exception
 from app.schema.ban_request_res import BanRequestResponse
 
 ban_requests = APIRouter(prefix="/api/ban_requests", tags=["ban_requests"])
 
 # response_model=list[BanRequestResponse]
 @ban_requests.get("", status_code=status.HTTP_200_OK, response_model=list[BanRequestResponse])
-def get_ban_requests(db: db_dependency, page: int = 1, filter_by: str = None):
+def get_ban_requests(
+    db: db_dependency, 
+    page: int = 1, 
+    date_order: Literal["recent", "old"] = "recent",
+    req_status: models.BanRequestStatus | None = None
+):
     if page < 1:
         page = 1
 
@@ -29,17 +36,27 @@ def get_ban_requests(db: db_dependency, page: int = 1, filter_by: str = None):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Exceeded from maximum page."
         )
+
+    if date_order == "recent":
+        order_date_by = models.BanRequest.date.desc()
+    if date_order == "old":
+        order_date_by = models.BanRequest.date.asc()
     
-    return db.execute(
+    query = (
         select(models.BanRequest)
         .options(
             selectinload(models.BanRequest.video)
                 .joinedload(models.Video.channel),
             selectinload(models.BanRequest.requested_user),
         )
-        .order_by(models.BanRequest.date.desc())
+        .order_by(order_date_by)
         .limit(limit)
-    ).scalars().all()
+    )
+
+    if req_status != None:
+        query = query.where(models.BanRequest.status == req_status)
+
+    return db.execute(query).scalars().all()
 
 
 @ban_requests.post("/{video_id}", status_code=status.HTTP_201_CREATED)
