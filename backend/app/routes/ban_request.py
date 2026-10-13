@@ -99,27 +99,39 @@ def request_ban_video(video_id: str, db: db_dependency, current_user: CurrentUse
     db.commit()
 
 
-@ban_requests.patch("/{video_id}", status_code=status.HTTP_204_NO_CONTENT)
-def reject_ban_request(video_id: str, db: db_dependency, current_user: CurrentUser):
-    if current_user.role != "admin":
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Not enough credentials"
-        )
+@ban_requests.patch("/approve/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def approve_ban_request(id: str, db: db_dependency, current_user: CurrentUser):
+    if current_user.role.value != "admin":
+        raise not_authorized_exception
 
-    ban_request = db.execute(
-        select(models.BanRequest)
-        .where(models.BanRequest.video_id == video_id)
-    ).scalars().all()
+    now = datetime.utcnow()
+    query = db.get(models.BanRequest, id)
 
-    if not ban_request:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No entry found"
-        )
+    # Add to Banned Videos table
+    db.add(models.BannedVideo(
+        video_id = query.video_id,
+        channel_id = query.video.channel_id,
+        request_id = query.id
+    ))
 
-    print(f"{ban_request = }")
+    # Update rows
+    query.status = models.BanRequestStatus.APPROVED
+    query.reviewed_at = now
+    query.reviewed_by = current_user.id
 
-    # db.delete(ban_request)
-    # db.commit()
+    db.commit()
 
+
+@ban_requests.patch("/reject/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def reject_ban_request(id: str, db: db_dependency, current_user: CurrentUser):
+    if current_user.role.value != "admin":
+        raise not_authorized_exception
+    
+    now = datetime.utcnow()
+    query = db.get(models.BanRequest, id)
+
+    query.status = models.BanRequestStatus.REJECTED
+    query.reviewed_at = now
+    query.reviewed_by = current_user.id
+
+    db.commit()
