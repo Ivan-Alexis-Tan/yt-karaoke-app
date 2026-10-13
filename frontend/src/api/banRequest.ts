@@ -6,8 +6,23 @@ import { Session } from "next-auth";
 // Utils and other helpers
 import { BASE_URL } from "../core/core";
 
-export async function getBanRequests(page: number = 1): Promise<BanRequestsResponse> {
-    const res = await fetch(`${BASE_URL}/ban_requests?page=${page}`)
+export async function getBanRequests(
+    page: number = 1, 
+    date_order: "recent" | "old" = "recent", 
+    req_status: BanRequestStatus | "all" = "all"
+): Promise<BanRequestsResponse> {
+    let params
+
+    if (req_status === "all") {
+        params = { page: `${page}`, date_order }
+    }
+    else {
+        params = { page: `${page}`, date_order, req_status }
+    }
+
+    const queryParams = new URLSearchParams(params)
+
+    const res = await fetch(`${BASE_URL}/ban_requests?${queryParams.toString()}`)
 
     if (!res.ok) {
         const body = await res.text()
