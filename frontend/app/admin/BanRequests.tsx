@@ -113,6 +113,7 @@ export default function BanRequests({ session }: { session: Session }) {
             <BanRequestCards 
                 banRequests={banRequests}
                 session={session}
+                req_status={filters.req_status}
                 className="max-h-200 mb-3 px-2 grid md:grid-cols-2 overflow-auto"
             />
 
