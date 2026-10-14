@@ -35,12 +35,17 @@ export async function getBanRequests(
 
 
 export async function requestBanVideo(
-    video_id: VideoType["video_id"], 
-    session: Session
+    video_id: VideoType["video_id"],
+    session: Session,
+    reason: string = ""
 ) {
     const res = await fetch(`${BASE_URL}/ban_requests/${video_id}`, {
         method: "POST",
-        headers: { Authorization: `Bearer ${session.backendToken}`},
+        headers: { 
+            Authorization: `Bearer ${session.backendToken}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ reason })
     })
 
     if (!res.ok) {
