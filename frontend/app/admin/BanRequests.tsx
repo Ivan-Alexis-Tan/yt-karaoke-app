@@ -5,7 +5,7 @@ import { Session } from "next-auth";
 import { useRouter, useSearchParams } from "next/navigation";
 
 // useHooks, and other helper functions
-import { getBanRequests } from "@/src/api/banRequest";
+import { getBanRequestCounts, getBanRequests } from "@/src/api/banRequest";
 import { BAN_REQUEST_STATUS } from "@/src/utils/constants";
 import DropdownWindow, { useDropdown } from "@/src/components/DropdownWindow";
 
@@ -23,6 +23,13 @@ const filterDefault: BanRequestFilters = {
     req_status: "pending",
 }
 
+const countsDefault: BanRequestCounts = {
+    pending: 0,
+    rejected: 0,
+    approved: 0,
+    all: 0
+}
+
 export default function BanRequests({ session }: { session: Session }) {
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -31,9 +38,10 @@ export default function BanRequests({ session }: { session: Session }) {
         dateDropdown: false,
         statusDropdown: false,
     })
-    const [limit, setLimit] = useState<number>(1)
+    const [currentPage, setCurrentPage] = useState<number>(1)
     const [filters, setFilters] = useState<BanRequestFilters>(filterDefault)
     const [banRequests, setBanRequests] = useState<BanRequestsResponse>([])
+    const [counts, setCounts] = useState<BanRequestCounts>(countsDefault)
 
     useEffect(() => {
         const currentSearchParams: BanRequestFilters = {
@@ -42,23 +50,29 @@ export default function BanRequests({ session }: { session: Session }) {
         }
 
         const fetchBanRequest = async () => {
+            const counts = await getBanRequestCounts()
             const result = await getBanRequests(
-                limit,
+                currentPage,
                 currentSearchParams.date_order,
                 currentSearchParams.req_status
             );
+
+            setCounts(counts)
             setBanRequests(result)
         };
 
         setFilters(currentSearchParams)
         fetchBanRequest()
-    }, [limit, searchParams])
+    }, [currentPage, searchParams])
 
     function setQueryParams(key: "date_order" | "req_status", val: string) {
         const params = new URLSearchParams(searchParams.toString())
         params.set(key, val)
         router.push(`?${params.toString()}`)
     }
+
+    const currentCount = counts[filters.req_status]
+    const totalPages = Math.ceil(currentCount / 5)
 
     return (
         <div>
@@ -105,6 +119,10 @@ export default function BanRequests({ session }: { session: Session }) {
                                 onClickFn={(option) => setQueryParams("req_status", option)}
                             />
                         }
+
+                        <div className="px-0.75 h-4 absolute -top-2 right-0 flex justify-center items-center text-background bg-green-400 rounded-full">
+                            <p>{currentCount}</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -118,11 +136,13 @@ export default function BanRequests({ session }: { session: Session }) {
             />
 
             {/* View More Button */}
-            <button onClick={_ => setLimit(p => p + 1)}
-                className="mx-auto w-30 block hover:bg-foreground hover:text-background border rounded-full"
-            >
-                View More
-            </button>
+            {(currentPage < totalPages)
+                && <button onClick={_ => setCurrentPage(p => Math.min(p + 1, totalPages))}
+                    className="mx-auto w-30 block hover:bg-foreground hover:text-background border rounded-full"
+                >
+                    View More
+                </button>
+            }
         </div>
     )
 }
