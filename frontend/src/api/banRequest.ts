@@ -33,6 +33,16 @@ export async function getBanRequests(
     return await res.json()
 }
 
+export async function getBanRequestCounts() {
+    const res = await fetch(`${BASE_URL}/ban_requests/counts`)
+
+    if (!res.ok) {
+        const body = await res.text()
+        throw new Error(`banVideo failed: ${res.status} ${body.slice(0, 300)}`)
+    }
+
+    return await res.json()
+}
 
 export async function requestBanVideo(
     video_id: VideoType["video_id"],
