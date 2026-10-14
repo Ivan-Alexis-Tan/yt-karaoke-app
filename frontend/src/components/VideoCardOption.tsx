@@ -26,10 +26,11 @@ import MoreOptionsIcon from "../svgs/MoreOptionsIcon";
 type VideoCardOptionProps = {
     video_details: VideoListResponse[number]
     currentUser: CurrentUserResponse | null
+    showBanRequestSentFn: () => void
     className?: string
 }
 
-export default function VideoCardOption({ video_details, currentUser, className }: VideoCardOptionProps) {
+export default function VideoCardOption({ video_details, showBanRequestSentFn, currentUser, className }: VideoCardOptionProps) {
     const { data: session } = useSession();
     const { showPopup, openPopup, popupWindowStates } = usePopupWindow({ 
         "banWindow": false,
@@ -41,7 +42,6 @@ export default function VideoCardOption({ video_details, currentUser, className 
     const songQueue = useSongQueue(songQueueSelector)
     const addSongQueue = useSongQueue(addSongQueueSelector)
     const updateTempBannedChannels = useCurrentVideo(updateTempBannedChannelsSelector)
-    const bannedChannels = useCurrentVideo(tempBannedChannelsSelector)
 
     function addToQueue() {
         const exists = songQueue.find(vid => vid.video_id === video_details.video_id)
@@ -155,6 +155,7 @@ export default function VideoCardOption({ video_details, currentUser, className 
                         requestBanVideo(video_details.video_id, session as Session)
                         updateTempBannedChannels(video_details.channel_title)
                         setOpenMore(false)
+                        showBanRequestSentFn()
                     }}
                     subHeaderText={`Request to ban "${video_details.channel_title}"?`}
                     confirmBtnMode="warning"

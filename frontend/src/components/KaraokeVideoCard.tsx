@@ -14,6 +14,7 @@ import VideoCardOption from "./VideoCardOption";
 export type KaraokeVideoCardType = {
     video_details: VideoListResponse[number]
     currentUser: CurrentUserResponse | null
+    showBanRequestSentFn: () => void
     arrange?: "row" | "col"
     disableQueBtn?: boolean
     className?: string
@@ -22,6 +23,7 @@ export type KaraokeVideoCardType = {
 export default function KaraokeVideoCard({
     video_details,
     currentUser,
+    showBanRequestSentFn,
     arrange = "row",
     disableQueBtn = false,
     className,
@@ -64,6 +66,7 @@ export default function KaraokeVideoCard({
             {!disableQueBtn && <VideoCardOption 
                 video_details={video_details} 
                 currentUser={currentUser}
+                showBanRequestSentFn={showBanRequestSentFn}
                 className="w-10 h-10 
                     flex lg:hidden absolute bottom-2 right-2 justify-center items-center 
                     hover:[&_button.more-option-btn]:bg-(--lucent-blk-clr)
