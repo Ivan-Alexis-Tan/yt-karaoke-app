@@ -16,7 +16,7 @@ export default function PaginatedVideoCards({ videoList, currentUser, arrange_vi
     const randVidList = use(videoList)
 
     const [openPages, setOpenPages] = useState(1)
-    const [flagBanRequest, setFlagBanRequest] = useState<boolean>(true)
+    const [flagBanRequest, setFlagBanRequest] = useState<boolean>(false)
 
     useEffect(() => {
         if (!flagBanRequest) return

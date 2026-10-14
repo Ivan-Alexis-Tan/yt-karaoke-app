@@ -22,6 +22,7 @@ import QueueAlertIcon from "../svgs/QueueAlertIcon"
 import BanIcon from "../svgs/BanIcon";
 import RequestBanIcon from "../svgs/RequestBanIcon";
 import MoreOptionsIcon from "../svgs/MoreOptionsIcon";
+import BanRequestForm from "./BanRequestForm";
 
 type VideoCardOptionProps = {
     video_details: VideoListResponse[number]
@@ -32,10 +33,11 @@ type VideoCardOptionProps = {
 
 export default function VideoCardOption({ video_details, showBanRequestSentFn, currentUser, className }: VideoCardOptionProps) {
     const { data: session } = useSession();
-    const { showPopup, openPopup, popupWindowStates } = usePopupWindow({ 
+    const { showPopup, openPopup, closePopup, popupWindowStates } = usePopupWindow({ 
         "banWindow": false,
         "banRequestWindow": false, 
     });
+
     const [queueNotif, setQueueNotif] = useState<QueueNotifType>("none");
     const [openMore, setOpenMore] = useState(false);
 
@@ -147,18 +149,19 @@ export default function VideoCardOption({ video_details, showBanRequestSentFn, c
 
             {/* Ban Request Popup */}
             {showPopup.banRequestWindow
-                && <PopupWindow 
-                    windowId="banRequestWindow"
-                    popupWindowStates={popupWindowStates}
-                    headerText="Confirm Request Ban"
-                    confirmFn={() => {
-                        requestBanVideo(video_details.video_id, session as Session)
+                && <BanRequestForm 
+                    video_details={video_details}
+                    submitBtnFn={() => {
                         updateTempBannedChannels(video_details.channel_title)
+                        closePopup("banRequestWindow")
                         setOpenMore(false)
                         showBanRequestSentFn()
                     }}
-                    subHeaderText={`Request to ban "${video_details.channel_title}"?`}
-                    confirmBtnMode="warning"
+                    cancelBtnFn={() => {
+                        closePopup("banRequestWindow")
+                        setOpenMore(false)
+                    }}
+                    session={session as Session}
                 />
             }
         </div>

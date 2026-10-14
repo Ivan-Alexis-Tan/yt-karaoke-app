@@ -18,6 +18,7 @@ export function usePopupWindow(popupWindowIds: PopupWindowIds) {
     return {
         showPopup,
         openPopup,
+        closePopup,
         popupWindowStates: {
             closePopup,
         }
