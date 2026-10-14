@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Body
 from sqlalchemy import select, func
 from sqlalchemy.orm import selectinload
 from starlette import status
@@ -60,7 +60,7 @@ def get_ban_requests(
 
 
 @ban_requests.post("/{video_id}", status_code=status.HTTP_201_CREATED)
-def request_ban_video(video_id: str, db: db_dependency, current_user: CurrentUser):
+def request_ban_video(video_id: str, db: db_dependency, current_user: CurrentUser, reason: str = Body(embed=True, default="")):
     # Check if banned =====================================
     is_banned = db.execute(
         select(models.BanRequest)
@@ -88,11 +88,10 @@ def request_ban_video(video_id: str, db: db_dependency, current_user: CurrentUse
             detail="Already banned"
         )
 
-    print(f"{is_banned = } | {been_requested = }")
-
     ban_request = models.BanRequest(
         video_id = video_id,
-        requested_by = current_user.id
+        requested_by = current_user.id,
+        reason = reason if reason != "" else None,
     )
 
     db.add(ban_request)
