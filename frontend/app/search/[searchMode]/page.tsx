@@ -15,6 +15,7 @@ import { SearchMode } from "@/src/types/states";
 import SaveSearchResult from "./SaveSearchResult";
 import LoadingSearchPage from "./LoadingSearchPage";
 import KaraokeVideoCard from "@/src/components/KaraokeVideoCard";
+import PaginatedVideoCards from "@/src/components/PaginatedVideoCards";
 
 type SearchPageProps = {
     searchParams: Promise<{query: string}>
@@ -64,13 +65,11 @@ const SearchResults = async ({ searchMode, query, session }: {
             {/* Video Cards */}
             {searchResults.length >= 1
                 ? <div className="mx-auto max-w-250">
-                    {searchResults.map(vid => (
-                        <KaraokeVideoCard key={vid.video_id}
-                            video_details={vid}
-                            currentUser={currentUser}
-                            className="[&_a]:grid-cols-1 sm:[&_a]:grid-cols-2"
-                        />
-                    ))}
+                    <PaginatedVideoCards 
+                        videoList={searchResults}
+                        currentUser={currentUser}
+                        className="[&_a]:grid-cols-1 sm:[&_a]:grid-cols-2"
+                    />
                 </div>
                 : <p className="text-2xl text-center">No song "{query}" found</p>
             }
