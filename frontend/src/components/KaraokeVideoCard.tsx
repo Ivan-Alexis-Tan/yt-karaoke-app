@@ -14,7 +14,7 @@ import VideoCardOption from "./VideoCardOption";
 export type KaraokeVideoCardType = {
     video_details: VideoListResponse[number]
     currentUser: CurrentUserResponse | null
-    showBanRequestSentFn: () => void
+    showBanRequestSentFn?: () => void
     arrange?: "row" | "col"
     disableQueBtn?: boolean
     className?: string
@@ -23,7 +23,7 @@ export type KaraokeVideoCardType = {
 export default function KaraokeVideoCard({
     video_details,
     currentUser,
-    showBanRequestSentFn,
+    showBanRequestSentFn = () => {},
     arrange = "row",
     disableQueBtn = false,
     className,
