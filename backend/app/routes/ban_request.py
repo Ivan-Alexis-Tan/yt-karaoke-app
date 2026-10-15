@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Body
-from sqlalchemy import select, func
+from sqlalchemy import select, func, case
 from sqlalchemy.orm import selectinload
 from starlette import status
 import math
@@ -13,7 +13,6 @@ from app.schema.ban_request_res import BanRequestResponse
 
 ban_requests = APIRouter(prefix="/api/ban_requests", tags=["ban_requests"])
 
-# response_model=list[BanRequestResponse]
 @ban_requests.get("", status_code=status.HTTP_200_OK, response_model=list[BanRequestResponse])
 def get_ban_requests(
     db: db_dependency, 
@@ -57,6 +56,27 @@ def get_ban_requests(
         query = query.where(models.BanRequest.status == req_status)
 
     return db.execute(query).scalars().all()
+
+
+@ban_requests.get("/counts")
+def ban_request_counts(db: db_dependency):
+    query = (
+        select(
+            func.count(
+                case((models.BanRequest.status == models.BanRequestStatus.APPROVED, 1))
+            ).label('approved'),
+            func.count(
+                case((models.BanRequest.status == models.BanRequestStatus.PENDING, 1))
+            ).label('pending'),
+            func.count(
+                case((models.BanRequest.status == models.BanRequestStatus.REJECTED, 1))
+            ).label('rejected'),
+            func.count(models.BanRequest.video_id).label("all")
+        )
+        .select_from(models.BanRequest)
+    )
+
+    return db.execute(query).mappings().one()
 
 
 @ban_requests.post("/{video_id}", status_code=status.HTTP_201_CREATED)
