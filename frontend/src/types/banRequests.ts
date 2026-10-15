@@ -23,3 +23,5 @@ type BanRequestsResponse = BanRequestType[]
 // Admin Search Params
 type DateOrderSearchParam = "recent" | "old"
 type ReqStatusSearchParam = BanRequestStatus | "all"
+
+type BanRequestCounts = Record<ReqStatusSearchParam, number>
