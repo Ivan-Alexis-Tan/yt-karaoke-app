@@ -16,7 +16,7 @@ from app.schema.mappers import mapVideoListResponse
 
 videos_router = APIRouter(prefix="/api/videos", tags=["videos"])
 
-@videos_router.get("/random", response_model=List[List[response_schema.VideoListResponse]])
+@videos_router.get("/random", response_model=List[response_schema.VideoListResponse])
 async def get_random_videos(db: db_dependency, payload: request_schema.GetRandVideosRequest = Depends()):
     stmt = (
         select(models.Video)
@@ -33,23 +33,10 @@ async def get_random_videos(db: db_dependency, payload: request_schema.GetRandVi
     )
     pulled = db.execute(stmt).scalars().all()
 
-    rand_vids = [
+    return [
         mapVideoListResponse(video)
         for video in pulled
     ]
-
-    # Prepares data for pagination
-    result: list[list[response_schema.VideoListResponse]] = []
-    start = 0
-    length = len(rand_vids)
-    for _ in range(math.ceil(payload.limit / payload.videos_per_page)):
-        sum = start + payload.videos_per_page
-        end = sum if length >= sum else length
-        
-        result.append(rand_vids[start:end])
-        start = end
-
-    return result
 
 
 @videos_router.get("/local", response_model=List[response_schema.VideoListResponse])
