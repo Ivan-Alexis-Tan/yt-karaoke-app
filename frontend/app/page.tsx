@@ -31,7 +31,7 @@ export default async function Home() {
 }
 
 const RandomVidsResult = async () => {
-  const randomVideos = getRandomVideos(15, 60)
+  const randomVideos = await getRandomVideos(15, 60)
   const session = await auth()
   const currentUser = session ? await getCurrentUser(session) : null
   
