@@ -89,23 +89,23 @@ export default function SongQueue({ closeFn, currentPath, currentUser, className
                 ? <div className="relative">
                     {songQueue.map(vid => (
                         <div key={vid.video_id} 
-                            className="mx-3 relative hover:bg-(--light-gray-clr) lg:hover:[&>button]:flex rounded-2xl"
+                            className="mx-3 relative hover:bg-(--light-gray-clr) lg:hover:[&_div.rm-btn-contnr]:flex rounded-2xl"
                         >
                             {/* Song on queue video card */}
                             <div onClick={_ => deleteSongQueue(vid.video_id)}>
                                 <KaraokeVideoCard 
                                     video_details={vid}
                                     currentUser={currentUser}
-                                    disableQueBtn={true}
+                                    moreOptionBtn={false}
                                     className="[&_a]:grid-cols-1! sm:[&_a]:grid-cols-2!"
                                 />
                             </div>
                             
                             {/* Delete from song queue button */}
-                            <div className="flex lg:hidden absolute bottom-2 right-2
-                                hover:[&_button.more-option-btn]:bg-(--lucent-blk-clr)"
+                            <div className="rm-btn-contnr flex lg:hidden absolute bottom-2 right-2
+                                hover:[&>button]:text-(--red-clr)"
                             >
-                                <button className=""
+                                <button
                                     onClick={_ => {
                                         deleteSongQueue(vid.video_id)
                                     }}
@@ -127,7 +127,9 @@ export default function SongQueue({ closeFn, currentPath, currentUser, className
             }
 
             {/* Confirm Delete Popup Window of Song Queue */}
-            {popupWindow && <ConfirmDeletePopup popupFn={setPopupWindow} emptySongQueue={emptySongQueue} />}
+            {popupWindow 
+                && <ConfirmDeletePopup popupFn={setPopupWindow} emptySongQueue={emptySongQueue} />
+            }
         </div>
     )
 }
