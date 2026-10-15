@@ -1,11 +1,14 @@
 "use client";
 
+// Next.js
 import { Dispatch, SetStateAction, use, useState } from "react";
 
-import { searchVideosLocal, searchVideosOnline } from "@/src/api/videosApi";
+// Types
 import { SearchMode } from "@/src/types/states";
-import { capsWord } from "@/src/utils/helpers";
 
+// Api fetch function, useHook and other helper functions
+import { searchVideosLocal, searchVideosOnline } from "@/src/api/videosApi";
+import { capsWord } from "@/src/utils/helpers";
 import useCurrentVideo, { 
     searchKeySelector, 
     updateSearchKeySelector, 
@@ -13,9 +16,10 @@ import useCurrentVideo, {
     videoListSelector 
 } from "@/src/utils/useCurrentVideo";
 
-import KaraokeVideoCard from "@/src/components/KaraokeVideoCard";
+// Components
 import Spinner from "@/src/components/Spinner";
 import SearchIcon from "@/src/svgs/SearchIcon";
+import PaginatedVideoCards from "@/src/components/PaginatedVideoCards";
 
 type VideoSearchProps = {
     currentUserPromise: Promise<CurrentUserResponse> | null
@@ -76,16 +80,15 @@ export default function VideoSearch({ className, currentUserPromise }: VideoSear
                         ? <CenterText text={`Search song ${searchMode === "local" ? "on local" : searchMode}`} />
                         : (
                             videoList.length >= 1
+                                // Search Result Video Cards
                                 ? <div className="player-video-karaoke">
                                     <p>{capsWord(searchMode)} search results:</p>
 
-                                    {videoList.map(vid => (
-                                        <KaraokeVideoCard key={vid.video_id}
-                                            video_details={vid}
-                                            currentUser={currentUser}
-                                            className="mx-auto max-w-200 lg:max-w-"
-                                        />
-                                    ))}
+                                    <PaginatedVideoCards
+                                        videoList={videoList}
+                                        currentUser={currentUser}
+                                        className="mx-auto max-w-200 lg:max-w-"
+                                    />
                                 </div>
                                 : <CenterText text={`Pressing "Enter" to start searching`} />
                         )
@@ -96,7 +99,7 @@ export default function VideoSearch({ className, currentUserPromise }: VideoSear
 } 
 
 const CenterText = ({ text }: { text: React.ReactNode }) => {
-        return (
+    return (
         <div className="h-full flex justify-center items-center">
             <h3 className="text-2xl">{text}</h3>
         </div>
