@@ -6,14 +6,14 @@ import KaraokeVideoCard from "@/src/components/KaraokeVideoCard"
 import CloseIcon from "../svgs/CloseIcon"
 
 type PaginatedVideoCardsProps = {
-    videoList: Promise<VideoListResponse[]>
+    videoList: Promise<VideoListResponse> | VideoListResponse
     currentUser: CurrentUserResponse | null
     arrange_videos?: "row" | "col"
     className?: string
 }
 
 export default function PaginatedVideoCards({ videoList, currentUser, arrange_videos = "row", className }: PaginatedVideoCardsProps) {
-    const randVidList = use(videoList)
+    const randVidList = videoList instanceof Promise ? use(videoList) : videoList
 
     const [openPages, setOpenPages] = useState(1)
     const [flagBanRequest, setFlagBanRequest] = useState<boolean>(false)
@@ -34,7 +34,7 @@ export default function PaginatedVideoCards({ videoList, currentUser, arrange_vi
         if (openPages < randVidList.length) setOpenPages(p => p + 1);
     }
 
-    const paginated = randVidList.slice(0, openPages)
+    const itemCount: number = openPages * 5
     
     return (
         <>
@@ -54,7 +54,7 @@ export default function PaginatedVideoCards({ videoList, currentUser, arrange_vi
             }
 
             <div className={`${className ?? ""}`}>
-                {paginated.map(page => page.map(vid => (
+                {randVidList.slice(0, itemCount).map(vid => (
                     <KaraokeVideoCard key={vid.video_id}
                         video_details={vid}
                         arrange={arrange_videos}
@@ -62,11 +62,11 @@ export default function PaginatedVideoCards({ videoList, currentUser, arrange_vi
                         showBanRequestSentFn={showBanRequestSent}
                         className="mx-auto max-w-200 lg:max-w-"
                     />
-                )))}
+                ))}
             </div>
 
             <div className="mx-auto py-2 flex justify-center">
-                {openPages < randVidList.length
+                {itemCount < randVidList.length
                     && <button className="w-60 hover:bg-foreground hover:text-background border rounded-2xl"
                         onClick={addPage}
                     >
