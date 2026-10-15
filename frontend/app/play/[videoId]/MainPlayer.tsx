@@ -19,7 +19,7 @@ import VideoCardSkeleton from "@/src/components/skeletons/VideoCardSkeleton";
 
 type MainPlayerProps = {
     videoId: string
-    videoList: Promise<VideoListResponse[]>
+    videoList: Promise<VideoListResponse>
     currentUser: Promise<CurrentUserResponse> | null
     className?: string 
 }
@@ -106,7 +106,7 @@ export default function MainPlayer({ videoId, videoList, currentUser, className 
 
 
 const VideoCardList = ({ videoList, currentUser }: { 
-    videoList: Promise<VideoListResponse[]>,
+    videoList: Promise<VideoListResponse>,
     currentUser: Promise<CurrentUserResponse> | null
 }) => {
     const userSession = currentUser ? use(currentUser) : null
