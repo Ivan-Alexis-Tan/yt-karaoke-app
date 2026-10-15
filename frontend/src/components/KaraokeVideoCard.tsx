@@ -16,7 +16,7 @@ export type KaraokeVideoCardType = {
     currentUser: CurrentUserResponse | null
     showBanRequestSentFn?: () => void
     arrange?: "row" | "col"
-    disableQueBtn?: boolean
+    moreOptionBtn?: boolean
     className?: string
 }
 
@@ -25,7 +25,7 @@ export default function KaraokeVideoCard({
     currentUser,
     showBanRequestSentFn = () => {},
     arrange = "row",
-    disableQueBtn = false,
+    moreOptionBtn = true,
     className,
 }: KaraokeVideoCardType) {
     const tempBannedChannels = useCurrentVideo(tempBannedChannelsSelector)
@@ -63,7 +63,7 @@ export default function KaraokeVideoCard({
             </Link>
 
             {/* Options button */}
-            {!disableQueBtn && <VideoCardOption 
+            {moreOptionBtn && <VideoCardOption 
                 video_details={video_details} 
                 currentUser={currentUser}
                 showBanRequestSentFn={showBanRequestSentFn}
