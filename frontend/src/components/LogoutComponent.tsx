@@ -4,7 +4,7 @@ import { signOut } from "next-auth/react";
 
 import PopupWindow, { usePopupWindow } from "./PopupWindow";
 
-export function LogoutComponent() {
+export default function LogoutComponent() {
     const { showPopup, openPopup, popupWindowStates } = usePopupWindow({
         logoutWindow: false
     })

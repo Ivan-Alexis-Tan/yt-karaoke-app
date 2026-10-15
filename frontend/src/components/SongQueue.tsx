@@ -13,7 +13,7 @@ import useSongQueue, {
 } from "../utils/useSongQueue";
 
 // Components
-import { LogoutComponent } from "./LogoutComponent";
+import LogoutComponent from "./LogoutComponent";
 import KaraokeVideoCard from "./KaraokeVideoCard";
 import CloseIcon from "../svgs/CloseIcon";
 import EmptyQueueIcon from "../svgs/EmptyQueueIcon";
