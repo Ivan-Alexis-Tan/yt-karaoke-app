@@ -16,6 +16,11 @@ import NextSongControl from "./NextSongControl";
 import VideoSearch from "./VideoSearch";
 import PaginatedVideoCards from "@/src/components/PaginatedVideoCards";
 import VideoCardSkeleton from "@/src/components/skeletons/VideoCardSkeleton";
+import BanIcon from "@/src/svgs/BanIcon";
+import RequestBanIcon from "@/src/svgs/RequestBanIcon";
+import BanRequestForm from "@/src/components/BanRequestForm";
+import VideoCardList from "./VideoCardList";
+import RightSidePane from "./RightSidePane";
 
 type MainPlayerProps = {
     videoId: string
@@ -83,23 +88,11 @@ export default function MainPlayer({ videoId, videoList, currentUser, className 
             </div>
 
             {/* Right Side Pane */}
-            <>
-                {showPane === "songs"
-                    && <div className="mx-5 lg:mx-0 lg:overflow-auto">
-                        <Suspense fallback={Array.from({ length: 10 }, (_, i) => (
-                            <VideoCardSkeleton key={i as number} 
-                                className="player-video-karaoke mx-auto max-w-200 lg:max-w-" 
-                            />
-                        ))}>
-                            <VideoCardList videoList={videoList} currentUser={currentUser} />
-                        </Suspense>
-                    </div>
-                }
-
-                {showPane === "search"
-                    && <VideoSearch currentUserPromise={currentUser} className="min-w-0 mx-5 lg:mx-0 lg:pr-5"/>
-                }
-            </>
+            <RightSidePane 
+                showPane={showPane}
+                videoList={videoList}
+                currentUser={currentUser}
+            />
         </div>
     )
 }
