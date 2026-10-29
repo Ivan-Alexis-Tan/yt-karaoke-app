@@ -2,10 +2,13 @@
 
 // Next.js imports
 import { Suspense, useEffect, useState, use } from "react";
+import { Session } from "next-auth";
 
 // useHooks, Utils, and other helper functions
 import useSongQueue, { songQueueSelector, deleteSongQueueSelector } from "@/src/utils/useSongQueue";
 import useCurrentVideo, { addCurrentSongSelector } from "@/src/utils/useCurrentVideo";
+import PopupWindow, { usePopupWindow } from "@/src/components/PopupWindow";
+import { banVideo } from "@/src/api/ban";
 
 // Components
 import KaraokePlayer from "./KaraokePlayer";
@@ -26,13 +29,15 @@ type MainPlayerProps = {
     videoId: string
     videoList: Promise<VideoListResponse>
     currentUser: Promise<CurrentUserResponse> | null
+    session: Session | null
     className?: string 
 }
 
-type PaneKeys = "hide" | "songs" | "search"
+export type PaneKeys = "hide" | "songs" | "search" | "ban"
 
-export default function MainPlayer({ videoId, videoList, currentUser, className }: MainPlayerProps) {
+export default function MainPlayer({ videoId, videoList, currentUser, session, className }: MainPlayerProps) {
     const [showPane, setShowPane] = useState<PaneKeys>("songs")
+    const { showPopup, openPopup, closePopup, popupWindowStates } = usePopupWindow({ banPopup: false })
     const currentVideo = useCurrentVideo(addCurrentSongSelector)
 
     const songQueue = useSongQueue(songQueueSelector)
@@ -45,6 +50,8 @@ export default function MainPlayer({ videoId, videoList, currentUser, className 
     const RightPaneControls = ({ className }: { className?: string }) => {
         return (
             <div className={`${className ?? ""} [&>button]:flex [&>button]:gap-1 [&>button]:items-center [&>button]:hover:border-foreground [&>button]:transition-all`}>
+                <BanVideoBtn currentUser={currentUser} openPopupFn={_ => openPopup("banPopup")} />
+                
                 <button onClick={_ => setShowPane("search")}
                     className={`${showPane === "search" && "bg-foreground text-background"} px-1 border border-background rounded`}
                 >
@@ -78,12 +85,12 @@ export default function MainPlayer({ videoId, videoList, currentUser, className 
                 <KaraokePlayer videoId={videoId} className="mb-5" />
 
                 <div className="mx-5 gap-3 flex flex-col sm:flex-row justify-between">
-                    <NextSongControl 
+                    <NextSongControl className="flex-1"
                         songQueue={songQueue}
                         deleteSongQueue={deleteSongQueue}
                     />
 
-                    <RightPaneControls className="gap-3 flex justify-end" />
+                    <RightPaneControls className="lg:gap-3 flex justify-evenly overflow-auto" />
                 </div>
             </div>
 
@@ -93,19 +100,77 @@ export default function MainPlayer({ videoId, videoList, currentUser, className 
                 videoList={videoList}
                 currentUser={currentUser}
             />
+
+            {/* Ban Request Popup Window */}
+            {showPopup.banPopup
+                && <BanPopup currentUserPromise={currentUser} 
+                    popupWindowStates={popupWindowStates} 
+                    closePopupFn={closePopup}
+                    videoId={videoId}
+                    session={session as Session}
+                />
+            }
         </div>
     )
 }
 
-
-const VideoCardList = ({ videoList, currentUser }: { 
-    videoList: Promise<VideoListResponse>,
-    currentUser: Promise<CurrentUserResponse> | null
+const BanVideoBtn = ({ currentUser, openPopupFn }: {
+    currentUser: MainPlayerProps["currentUser"]
+    openPopupFn: (windowId: string) => any
 }) => {
-    const userSession = currentUser ? use(currentUser) : null
+    const user = use(currentUser as Promise<CurrentUserResponse>)
     return (
-        <PaginatedVideoCards videoList={videoList} currentUser={userSession}
-            className="player-video-karaoke [&_a.karaoke-video-card]:mx-5 lg:[&_div.karaoke-video-card]:mx-0 lg:[&_div.karaoke-video-card]:mr-5"   
+        <Suspense fallback={
+            <button disabled
+                className={`px-1 text-(--gray-clr) hover:cursor-default!`}
+            >
+                <BanIcon className="w-7 h-7" />
+                Ban
+            </button>
+        }>
+            <button
+                className={`px-1 border border-background rounded hover:text-(--red-clr) whitespace-nowrap`}
+                title={user.role === "admin" ? "Ban channel" : "Send ban request"}
+                onClick={() => openPopupFn("banPopup")}
+            >
+                {user.role === "admin"
+                    ? <BanIcon className="w-7 h-7" />
+                    : <RequestBanIcon className="w-7 h-7" />
+                }
+                Ban
+            </button>
+        </Suspense>
+    )
+}
+
+const BanPopup = ({ currentUserPromise, popupWindowStates, closePopupFn, session, videoId }: { 
+    currentUserPromise: MainPlayerProps["currentUser"]
+    popupWindowStates: {closePopup: (popupWindowId: string) => void}
+    closePopupFn: (windowId: string) => void
+    videoId: string
+    session: Session
+}) => {
+    const currentUser = currentUserPromise instanceof Promise
+        ? use(currentUserPromise)
+        : currentUserPromise
+
+    if (currentUser?.role === "admin") return (
+        <PopupWindow windowId="banPopup" 
+            popupWindowStates={popupWindowStates}
+            headerText="Confirm to ban this song"
+            confirmFn={() => {
+                closePopupFn("banPopup")
+                banVideo(videoId, session)
+            }}
+            confirmBtnMode="warning"
+        />
+    )
+    else return (
+        <BanRequestForm 
+            video_details={{ video_id: videoId}} 
+            session={session as Session} 
+            submitBtnFn={() => closePopupFn("banPopup")} 
+            cancelBtnFn={() => closePopupFn("banPopup")}
         />
     )
 }
