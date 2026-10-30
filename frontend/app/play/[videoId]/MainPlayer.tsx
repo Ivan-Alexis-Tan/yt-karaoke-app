@@ -25,21 +25,23 @@ import BanRequestForm from "@/src/components/BanRequestForm";
 import VideoCardList from "./VideoCardList";
 import RightSidePane from "./RightSidePane";
 import NotifPopup, { useNotify } from "@/src/components/NotifPopup";
+import { auth } from "@/auth";
+import { useSession } from "next-auth/react";
 
 type MainPlayerProps = {
     videoId: string
     videoList: Promise<VideoListResponse>
     currentUser: Promise<CurrentUserResponse> | null
-    session: Session | null
     className?: string 
 }
 
 export type PaneKeys = "hide" | "songs" | "search" | "ban"
 
-export default function MainPlayer({ videoId, videoList, currentUser, session, className }: MainPlayerProps) {
+export default function MainPlayer({ videoId, videoList, currentUser, className }: MainPlayerProps) {
+    const { data: session } = useSession()
     const [showPane, setShowPane] = useState<PaneKeys>("songs")
     const { showPopup, openPopup, closePopup, popupWindowStates } = usePopupWindow({ banPopup: false })
-    const { notifStates, showNotif, closeNotif, notifPopupTools } = useNotify({ 
+    const { notifStates, showNotif, notifPopupTools } = useNotify({ 
         banSuccess: false,
         requestSuccess: false,
     })
@@ -113,6 +115,7 @@ export default function MainPlayer({ videoId, videoList, currentUser, session, c
                 />
             }
 
+            {/* Notification Windows */}
             {notifStates.banSuccess
                 && <NotifPopup notifId="banSuccess" message="Banned Successfully" notifPopupTools={notifPopupTools} />
             }
