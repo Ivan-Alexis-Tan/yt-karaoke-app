@@ -8,7 +8,7 @@ import { Session } from "next-auth";
 import { requestBanVideo } from "../api/banRequest";
 
 type BanRequestFormProps = {
-    video_details: VideoType
+    video_details: Pick<VideoType, "video_id"> & Partial<Pick<VideoType, "channel_title">>
     submitBtnFn: () => any
     cancelBtnFn: () => any
     session: Session
@@ -17,13 +17,14 @@ type BanRequestFormProps = {
 
 export default function BanRequestForm({ video_details, submitBtnFn = () => {}, cancelBtnFn, session, className }: BanRequestFormProps) {
     const [reason, setReason] = useState<string>("")
+    const { video_id, channel_title } = video_details
 
     return (
         <div className={`${className ?? ""} fixed top-0 left-0 w-full h-full z-(--z-popup-window) flex justify-center items-center bg-(--lucent-blk-clr)`}>
             <div className="w-100 h-100 p-5 flex flex-col justify-evenly items-center bg-(--light-gray-clr) text-white rounded-2xl">
                 <div>
                     <h3 className="mb-3 text-xl font-bold text-center">Submit Ban Request</h3>
-                    <p className="text-center">Ban {video_details.channel_title}</p>
+                    <p className="text-center">Ban {channel_title ?? "Song"}</p>
                 </div>
 
                 <div className="w-full gap-3 [&_span]:px-1 flex flex-col [&_span]:text-end [&_span]:underline [&_span]:underline-offset-4 [&_span]:rounded [&_span]:hover:cursor-pointer">
@@ -45,7 +46,7 @@ export default function BanRequestForm({ video_details, submitBtnFn = () => {}, 
 
                 <div className="popup-btns w-full flex justify-evenly *:p-2 *:border *:border-foreground *:rounded-2xl">
                     <button onClick={() => {
-                        requestBanVideo(video_details.video_id, session as Session, reason)
+                        requestBanVideo(video_id, session as Session, reason)
                         submitBtnFn()
                     }}
                         className={`min-w-15 hover:bg-(--red-clr) hover:border-(--red-clr)`}
