@@ -3,8 +3,8 @@
 import { BASE_URL } from "../core/core";
 import { Session } from "next-auth";
 
-export async function banVideo(video: VideoType, session: Session) {
-    const res = await fetch(`${BASE_URL}/ban/videos/${video.video_id}`, {
+export async function banVideo(videoId: VideoType["video_id"], session: Session) {
+    const res = await fetch(`${BASE_URL}/ban/videos/${videoId}`, {
         method: "POST",
         headers: {
             Authorization: `Bearer ${session?.backendToken}`
