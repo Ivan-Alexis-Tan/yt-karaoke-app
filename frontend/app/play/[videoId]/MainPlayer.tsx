@@ -3,12 +3,12 @@
 // Next.js imports
 import { Suspense, useEffect, useState, use } from "react";
 import { Session } from "next-auth";
+import { useSession } from "next-auth/react";
 
 // useHooks, Utils, and other helper functions
 import useSongQueue, { songQueueSelector, deleteSongQueueSelector } from "@/src/utils/useSongQueue";
 import useCurrentVideo, { addCurrentSongSelector } from "@/src/utils/useCurrentVideo";
-import PopupWindow, { usePopupWindow } from "@/src/components/PopupWindow";
-import { banVideo } from "@/src/api/ban";
+import { usePopupWindow } from "@/src/components/PopupWindow";
 
 // Components
 import KaraokePlayer from "./KaraokePlayer";
@@ -16,19 +16,13 @@ import SongNoteIcon from "@/src/svgs/SongNoteIcon";
 import SearchIcon from "@/src/svgs/SearchIcon";
 import HideIcon from "@/src/svgs/HideIcon";
 import NextSongControl from "./NextSongControl";
-import VideoSearch from "./VideoSearch";
-import PaginatedVideoCards from "@/src/components/PaginatedVideoCards";
-import VideoCardSkeleton from "@/src/components/skeletons/VideoCardSkeleton";
 import BanIcon from "@/src/svgs/BanIcon";
 import RequestBanIcon from "@/src/svgs/RequestBanIcon";
-import BanRequestForm from "@/src/components/BanRequestForm";
-import VideoCardList from "./VideoCardList";
 import RightSidePane from "./RightSidePane";
 import NotifPopup, { useNotify } from "@/src/components/NotifPopup";
-import { auth } from "@/auth";
-import { useSession } from "next-auth/react";
+import BanNotifPopup from "./BanNotifPopup";
 
-type MainPlayerProps = {
+export type MainPlayerProps = {
     videoId: string
     videoList: Promise<VideoListResponse>
     currentUser: Promise<CurrentUserResponse> | null
@@ -106,7 +100,7 @@ export default function MainPlayer({ videoId, videoList, currentUser, className 
 
             {/* Ban Request Popup Window */}
             {showPopup.banPopup
-                && <BanPopup currentUserPromise={currentUser} 
+                && <BanNotifPopup currentUserPromise={currentUser} 
                     popupWindowStates={popupWindowStates} 
                     closePopupFn={closePopup}
                     showNotifFn={showNotif}
@@ -155,42 +149,5 @@ const BanVideoBtn = ({ currentUser, openPopupFn }: {
                 </button>
             }
         </Suspense>
-    )
-}
-
-const BanPopup = ({ currentUserPromise, popupWindowStates, closePopupFn, showNotifFn, session, videoId }: { 
-    currentUserPromise: MainPlayerProps["currentUser"]
-    popupWindowStates: {closePopup: (popupWindowId: string) => void}
-    closePopupFn: (windowId: string) => void
-    showNotifFn: (notifId: string) => void
-    videoId: string
-    session: Session
-}) => {
-    const currentUser = currentUserPromise instanceof Promise
-        ? use(currentUserPromise)
-        : currentUserPromise
-
-    if (currentUser?.role === "admin") return (
-        <PopupWindow windowId="banPopup" 
-            popupWindowStates={popupWindowStates}
-            headerText="Confirm to ban this song"
-            confirmFn={() => {
-                closePopupFn("banPopup")
-                showNotifFn("banSuccess")
-                banVideo(videoId, session)
-            }}
-            confirmBtnMode="warning"
-        />
-    )
-    else return (
-        <BanRequestForm 
-            video_details={{ video_id: videoId}} 
-            session={session as Session} 
-            submitBtnFn={() => {
-                closePopupFn("banPopup")
-                showNotifFn("requestSuccess")
-            }} 
-            cancelBtnFn={() => closePopupFn("banPopup")}
-        />
     )
 }
