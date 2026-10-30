@@ -10,10 +10,9 @@ import { QueueNotifType } from "../types/states"
 
 // Custom useHooks and Other Functional imports
 import useSongQueue, { addSongQueueSelector, songQueueSelector } from "../utils/useSongQueue"
-import useCurrentVideo, { tempBannedChannelsSelector, updateTempBannedChannelsSelector } from "../utils/useCurrentVideo";
+import useCurrentVideo, { updateTempBannedChannelsSelector } from "../utils/useCurrentVideo";
 import PopupWindow, { usePopupWindow } from "./PopupWindow";
 import { banVideo } from "../api/ban";
-import { requestBanVideo } from "../api/banRequest";
 
 // Components
 import AddToListIcon from "../svgs/AddToListIcon"
@@ -37,6 +36,7 @@ export default function VideoCardOption({ video_details, showBanRequestSentFn, c
         "banWindow": false,
         "banRequestWindow": false, 
     });
+    const { video_id, channel_title } = video_details
 
     const [queueNotif, setQueueNotif] = useState<QueueNotifType>("none");
     const [openMore, setOpenMore] = useState(false);
@@ -46,7 +46,7 @@ export default function VideoCardOption({ video_details, showBanRequestSentFn, c
     const updateTempBannedChannels = useCurrentVideo(updateTempBannedChannelsSelector)
 
     function addToQueue() {
-        const exists = songQueue.find(vid => vid.video_id === video_details.video_id)
+        const exists = songQueue.find(vid => vid.video_id === video_id)
         if (!exists) {
             addSongQueue(video_details)
             setQueueNotif("added")
@@ -138,11 +138,11 @@ export default function VideoCardOption({ video_details, showBanRequestSentFn, c
                     popupWindowStates={popupWindowStates}
                     headerText="Confirm Ban Channel"
                     confirmFn={() => {
-                        banVideo(video_details, session as Session)
-                        updateTempBannedChannels(video_details.channel_title)
+                        banVideo(video_id, session as Session)
+                        updateTempBannedChannels(channel_title)
                         setOpenMore(false)
                     }}
-                    subHeaderText={`Ban "${video_details.channel_title}"?`}
+                    subHeaderText={`Ban "${channel_title}"?`}
                     confirmBtnMode="warning"
                 />
             }
@@ -152,7 +152,7 @@ export default function VideoCardOption({ video_details, showBanRequestSentFn, c
                 && <BanRequestForm 
                     video_details={video_details}
                     submitBtnFn={() => {
-                        updateTempBannedChannels(video_details.channel_title)
+                        updateTempBannedChannels(channel_title)
                         closePopup("banRequestWindow")
                         setOpenMore(false)
                         showBanRequestSentFn()
