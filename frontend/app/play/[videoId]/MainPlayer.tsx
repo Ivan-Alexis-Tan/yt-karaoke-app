@@ -24,6 +24,7 @@ import RequestBanIcon from "@/src/svgs/RequestBanIcon";
 import BanRequestForm from "@/src/components/BanRequestForm";
 import VideoCardList from "./VideoCardList";
 import RightSidePane from "./RightSidePane";
+import NotifPopup, { useNotify } from "@/src/components/NotifPopup";
 
 type MainPlayerProps = {
     videoId: string
@@ -38,8 +39,12 @@ export type PaneKeys = "hide" | "songs" | "search" | "ban"
 export default function MainPlayer({ videoId, videoList, currentUser, session, className }: MainPlayerProps) {
     const [showPane, setShowPane] = useState<PaneKeys>("songs")
     const { showPopup, openPopup, closePopup, popupWindowStates } = usePopupWindow({ banPopup: false })
-    const currentVideo = useCurrentVideo(addCurrentSongSelector)
+    const { notifStates, showNotif, closeNotif, notifPopupTools } = useNotify({ 
+        banSuccess: false,
+        requestSuccess: false,
+    })
 
+    const currentVideo = useCurrentVideo(addCurrentSongSelector)
     const songQueue = useSongQueue(songQueueSelector)
     const deleteSongQueue = useSongQueue(deleteSongQueueSelector)
 
@@ -95,20 +100,25 @@ export default function MainPlayer({ videoId, videoList, currentUser, session, c
             </div>
 
             {/* Right Side Pane */}
-            <RightSidePane 
-                showPane={showPane}
-                videoList={videoList}
-                currentUser={currentUser}
-            />
+            <RightSidePane showPane={showPane} videoList={videoList} currentUser={currentUser} />
 
             {/* Ban Request Popup Window */}
             {showPopup.banPopup
                 && <BanPopup currentUserPromise={currentUser} 
                     popupWindowStates={popupWindowStates} 
                     closePopupFn={closePopup}
+                    showNotifFn={showNotif}
                     videoId={videoId}
                     session={session as Session}
                 />
+            }
+
+            {notifStates.banSuccess
+                && <NotifPopup notifId="banSuccess" message="Banned Successfully" notifPopupTools={notifPopupTools} />
+            }
+
+            {notifStates.requestSuccess
+                && <NotifPopup notifId="requestSuccess" message="Ban Request Sent" notifPopupTools={notifPopupTools} />
             }
         </div>
     )
@@ -118,7 +128,7 @@ const BanVideoBtn = ({ currentUser, openPopupFn }: {
     currentUser: MainPlayerProps["currentUser"]
     openPopupFn: (windowId: string) => any
 }) => {
-    const user = use(currentUser as Promise<CurrentUserResponse>)
+    const user = currentUser ? use(currentUser) : currentUser
     return (
         <Suspense fallback={
             <button disabled
@@ -128,25 +138,28 @@ const BanVideoBtn = ({ currentUser, openPopupFn }: {
                 Ban
             </button>
         }>
-            <button
-                className={`px-1 border border-background rounded hover:text-(--red-clr) whitespace-nowrap`}
-                title={user.role === "admin" ? "Ban channel" : "Send ban request"}
-                onClick={() => openPopupFn("banPopup")}
-            >
-                {user.role === "admin"
-                    ? <BanIcon className="w-7 h-7" />
-                    : <RequestBanIcon className="w-7 h-7" />
-                }
-                Ban
-            </button>
+            {user
+                && <button
+                    className={`px-1 border border-background rounded hover:text-(--red-clr) whitespace-nowrap`}
+                    title={user?.role === "admin" ? "Ban channel" : "Send ban request"}
+                    onClick={() => openPopupFn("banPopup")}
+                >
+                    {user?.role === "admin"
+                        ? <BanIcon className="w-7 h-7" />
+                        : <RequestBanIcon className="w-7 h-7" />
+                    }
+                    Ban
+                </button>
+            }
         </Suspense>
     )
 }
 
-const BanPopup = ({ currentUserPromise, popupWindowStates, closePopupFn, session, videoId }: { 
+const BanPopup = ({ currentUserPromise, popupWindowStates, closePopupFn, showNotifFn, session, videoId }: { 
     currentUserPromise: MainPlayerProps["currentUser"]
     popupWindowStates: {closePopup: (popupWindowId: string) => void}
     closePopupFn: (windowId: string) => void
+    showNotifFn: (notifId: string) => void
     videoId: string
     session: Session
 }) => {
@@ -160,6 +173,7 @@ const BanPopup = ({ currentUserPromise, popupWindowStates, closePopupFn, session
             headerText="Confirm to ban this song"
             confirmFn={() => {
                 closePopupFn("banPopup")
+                showNotifFn("banSuccess")
                 banVideo(videoId, session)
             }}
             confirmBtnMode="warning"
@@ -169,7 +183,10 @@ const BanPopup = ({ currentUserPromise, popupWindowStates, closePopupFn, session
         <BanRequestForm 
             video_details={{ video_id: videoId}} 
             session={session as Session} 
-            submitBtnFn={() => closePopupFn("banPopup")} 
+            submitBtnFn={() => {
+                closePopupFn("banPopup")
+                showNotifFn("requestSuccess")
+            }} 
             cancelBtnFn={() => closePopupFn("banPopup")}
         />
     )
