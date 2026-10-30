@@ -22,12 +22,12 @@ import SearchIcon from "@/src/svgs/SearchIcon";
 import PaginatedVideoCards from "@/src/components/PaginatedVideoCards";
 
 type VideoSearchProps = {
-    currentUserPromise: Promise<CurrentUserResponse> | null
+    currentUserPromise: Promise<CurrentUserResponse> | CurrentUserResponse | null
     className?: string
 }
 
 export default function VideoSearch({ className, currentUserPromise }: VideoSearchProps) {
-    const currentUser = currentUserPromise ? use(currentUserPromise) : null
+    const currentUser = currentUserPromise instanceof Promise ? use(currentUserPromise) : currentUserPromise
     const [search, setSearch] = useState<string>("")
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [searchMode, setSearchMode] = useState<SearchMode>("local")
