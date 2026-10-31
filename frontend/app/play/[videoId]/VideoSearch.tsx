@@ -20,6 +20,7 @@ import useCurrentVideo, {
 import Spinner from "@/src/components/Spinner";
 import SearchIcon from "@/src/svgs/SearchIcon";
 import PaginatedVideoCards from "@/src/components/PaginatedVideoCards";
+import CloseIcon from "@/src/svgs/CloseIcon";
 
 type VideoSearchProps = {
     currentUserPromise: Promise<CurrentUserResponse> | CurrentUserResponse | null
@@ -126,7 +127,7 @@ const SearchBar = ({
     className
 }: SearchBarProp) => {
     return (
-        <div className={`${className ?? ""} w-full pr-5 flex gap-2 items-center`}>
+        <div className={`${className ?? ""} w-full flex gap-2 items-center justify-center`}>
             <button className="w-13 my-2 px-1 bg-foreground text-background hover:bg-(--red-clr) hover:text-white transition-colors"
                 onClick={_ => setSearchModeFn(p => p === "local" ? "online" : "local")}
                 title={`Is set to ${searchMode} search`}
@@ -134,23 +135,34 @@ const SearchBar = ({
                 {capsWord(searchMode)}
             </button>
             
-            <button className={`hover:bg-foreground hover:text-background rounded px-2`}
-                onClick={fetchVideos}
-            >
-                <SearchIcon className="w-7 h-7" />
-            </button>
+            <div className="player-search-bar min-w-0 max-w-120 py-1 flex-1 flex items-center border border-background">
+                <input type="text" 
+                    title="Local search"
+                    placeholder={searchKey !== "" ? searchKey : `${capsWord(searchMode)} search`}
+                    value={search}
+                    onChange={e => setSearchFn(e.target.value)}
+                    onKeyUp={e => {
+                        if (e.key !== "Enter") return
+                        fetchVideos()
+                    }}
+                    className="min-w-0 px-2 border border-background border-b-foreground flex-1"
+                />
 
-            <input type="text" 
-                title="Local search"
-                placeholder={searchKey !== "" ? searchKey : `${capsWord(searchMode)} search`}
-                value={search}
-                onChange={e => setSearchFn(e.target.value)}
-                onKeyUp={e => {
-                    if (e.key !== "Enter") return
-                    fetchVideos()
-                }}
-                className="min-w-0 flex-1 px-2 border-b"
-            />
+                {search !== ""
+                    && <button className="hover:text-(--red-clr) rounded"
+                        onClick={_ => setSearchFn("")}
+                    >
+                        <CloseIcon className="w-7 h-7" />
+                    </button>
+                }
+
+                <button className={`m-1 px-1 hover:bg-foreground hover:text-background rounded`}
+                    onClick={fetchVideos}
+                    title="Search"
+                >
+                    <SearchIcon className="w-7 h-7" />
+                </button>
+            </div>
         </div>
     )
 }
