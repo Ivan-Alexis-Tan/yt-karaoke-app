@@ -75,34 +75,50 @@ export default function VideoSearch({ className, currentUserPromise }: VideoSear
             />
 
             {isLoading
-                ? <CenterText text={<Spinner />} />
-                : (
-                    search === "" && videoList.length === 0
-                        ? <CenterText text={`Search song ${searchMode === "local" ? "on local" : searchMode}`} />
-                        : (
-                            videoList.length >= 1
-                                // Search Result Video Cards
-                                ? <div className="player-video-karaoke">
-                                    <p>{capsWord(searchMode)} search results:</p>
+                ? <CenterText>
+                    <Spinner />
+                </CenterText>
+                : <>
+                    {videoList.length >= 1
+                        && <div className="player-video-karaoke">
+                            <p>{capsWord(searchMode)} search results:</p>
 
-                                    <PaginatedVideoCards
-                                        videoList={videoList}
-                                        currentUser={currentUser}
-                                        className="mx-auto max-w-200 lg:max-w-"
-                                    />
-                                </div>
-                                : <CenterText text={`Pressing "Enter" to start searching`} />
-                        )
-                )
+                            <PaginatedVideoCards
+                                videoList={videoList}
+                                currentUser={currentUser}
+                                className="mx-auto max-w-200 lg:max-w-"
+                            />
+                        </div>
+                    }
+
+                    {search === "" && searchKey === "" && videoList.length === 0
+                        && <CenterText>
+                            <h3>Search song {searchMode === "local" ? "on local" : searchMode}</h3>
+                        </CenterText>
+                    }
+
+                    {search !== "" && searchKey === "" && videoList.length === 0 
+                        && <CenterText>
+                            <h3>Press Enter</h3>
+                        </CenterText>
+                    }
+
+                    {searchKey !== "" && videoList.length === 0
+                        && <CenterText>
+                            <h3>No "{searchKey}" found.</h3>
+                            <p><i>Try online search.</i></p>
+                        </CenterText>
+                    }
+                </>
             }
         </div>
     )
 } 
 
-const CenterText = ({ text }: { text: React.ReactNode }) => {
+const CenterText = ({ children }: { children: React.ReactNode }) => {
     return (
-        <div className="h-full flex justify-center items-center">
-            <h3 className="text-2xl">{text}</h3>
+        <div className="h-full flex flex-col justify-center items-center [&>h3]:text-2xl">
+            {children}
         </div>
     )
 }
