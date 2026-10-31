@@ -79,12 +79,6 @@ main input:focus-visible {
   }
 }
 
-/* Player Search Bar */
-.player-search-bar:has(> input:focus) {
-  border: 1px solid var(--red-clr);
-  border-radius: 15px;
-}
-
 /* Player Page Video Card */
 .player-video-karaoke {
   .karaoke-video-card a, .karaoke-video-card {

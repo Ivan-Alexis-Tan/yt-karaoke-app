@@ -151,7 +151,7 @@ const SearchBar = ({
                 {capsWord(searchMode)}
             </button>
             
-            <div className="player-search-bar min-w-0 max-w-120 py-1 flex-1 flex items-center border border-background">
+            <div className="player-search-bar min-w-0 max-w-120 py-1 flex-1 flex items-center [&:has(>input:focus)]:border-(--red-clr) border border-(--light-gray-clr) rounded-2xl">
                 <input type="text" 
                     title="Local search"
                     placeholder={searchKey !== "" ? searchKey : `${capsWord(searchMode)} search`}
@@ -161,7 +161,7 @@ const SearchBar = ({
                         if (e.key !== "Enter") return
                         fetchVideos()
                     }}
-                    className="min-w-0 px-2 border border-background border-b-foreground flex-1"
+                    className="min-w-0 px-2 flex-1"
                 />
 
                 {search !== ""
